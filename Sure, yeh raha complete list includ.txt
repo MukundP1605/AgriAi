@@ -22,7 +22,7 @@ Sure, yeh raha complete list including frontend:
 
    ```
    uvicorn app.main:app --reload
-   ```
+   
 
 4. **Run Retrain Scheduler**:
 

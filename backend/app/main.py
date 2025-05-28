@@ -1,44 +1,65 @@
 import sys
 import os
+import logging
+from dotenv import load_dotenv
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 
-# Add the parent directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from fastapi import FastAPI
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 from app.routes import crop
 from app.routes.user_data import router as save_user_data_router
 from app.routes.disease import router as disease_router
+from app.routes.chatbot import router as chatbot_router
+from app.database import Base, engine, get_db, SessionLocal
+from sqlalchemy.orm import Session
+from app.utils.redis_client import redis_client
 
-# Import database components
-from app.database import Base, engine
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# Create all tables
-print("Ensuring database tables exist...")
-Base.metadata.create_all(bind=engine)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if not OPENROUTER_API_KEY:
+    logger.error("OPENROUTER_API_KEY is missing in .env file")
+    raise ValueError("OPENROUTER_API_KEY is missing in .env file")
+
+try:
+    logger.info("Ensuring database tables exist...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables are ready.")
+except Exception as e:
+    logger.error(f"Error creating tables: {e}")
+    raise
 
 app = FastAPI(
-    title="AgriAI Crop Prediction API",
+    title="🌿 AgriAI Crop Prediction API",
     version="1.0.0",
     description="An API to predict the best crop based on soil and weather conditions."
 )
 
-from fastapi.middleware.cors import CORSMiddleware
-
-# CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # or ["*"] for development
+    allow_origins=["http://localhost:5173"],  # frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Include routers
 app.include_router(crop.router, tags=["Crop Prediction"])
 app.include_router(save_user_data_router, tags=["User Data"])
 app.include_router(disease_router, tags=["Disease Detection"])
+app.include_router(chatbot_router, prefix="/api/chatbot", tags=["Chatbot"])
 
-# ✅ Root endpoint
-@app.get("/")
-def read_root():
+@app.on_event("startup")
+async def startup_event():
+    try:
+        await redis_client.ping()
+        logger.info("✅ Redis connected successfully!")
+    except Exception as e:
+        logger.error(f"⚠️ Redis connection failed at startup: {e}")
+
+@app.get("/", tags=["Root"])
+async def read_root():
     return {"message": "🌿 AgriAI API is up and running!"}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
@@ -19,6 +20,13 @@ const Home = () => {
         <div className="p-4 border rounded hover:shadow-md bg-green-50">
           <h2 className="font-bold">💬 AI Chat Assistant</h2>
           <p>Ask questions and get expert agricultural advice.</p>
+        </div>
+        <div className="p-4 border rounded hover:shadow-md bg-green-50">
+          <h2 className="font-bold">👤 User Account</h2>
+          <p>Login to access personalized features and save your data.</p>
+          <Link to="/login" className="mt-2 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            Login Now
+          </Link>
         </div>
       </div>
     </div>

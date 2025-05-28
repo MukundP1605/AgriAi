@@ -19,20 +19,20 @@ const Navbar = () => {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     fontWeight: 700
   };
-  
-  return (
+    return (
     <nav>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>🌿 AgriAI</div>
-        <div>
-          <Link to="/" style={location.pathname === '/' ? activeLinkStyle : linkStyle}>Home</Link>
+        <div>          <Link to="/" style={location.pathname === '/' ? activeLinkStyle : linkStyle}>Home</Link>
           <Link to="/crop" style={location.pathname === '/crop' ? activeLinkStyle : linkStyle}>Crop</Link>
           <Link to="/disease" style={location.pathname === '/disease' ? activeLinkStyle : linkStyle}>Disease</Link>
           <Link to="/chat" style={location.pathname === '/chat' ? activeLinkStyle : linkStyle}>Chat</Link>
+          <Link to="/login" style={location.pathname === '/login' ? activeLinkStyle : linkStyle}>Login</Link>
         </div>
       </div>
     </nav>
   );
 };
+
 
 export default Navbar;

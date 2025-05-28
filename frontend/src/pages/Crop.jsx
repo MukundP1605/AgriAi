@@ -3,6 +3,9 @@ import axios from 'axios';
 
 function Crop() {
   const [formData, setFormData] = useState({
+    userId: '',
+    location: '',
+    soil_quality: '',
     N: '',
     P: '',
     K: '',
@@ -22,12 +25,19 @@ function Crop() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setPrediction('');
     try {
-      console.log("Form Data:", formData);
-      const response = await axios.post('http://127.0.0.1:8000/predict-crop', formData);
+      console.log('Form Data:', formData);
 
-      console.log("API Response:", response.data);
-      setPrediction(response.data.prediction);  // ✅ Fixed this line
+      // If your backend expects userId as int, convert here:
+      const payload = {
+        ...formData,
+        userId: Number(formData.userId)
+      };
+
+      const response = await axios.post('http://127.0.0.1:8000/predict-crop', payload);
+      // Fix here: use response.data.crop instead of .prediction
+      setPrediction(response.data.crop || 'No prediction returned');
     } catch (error) {
       console.error('Prediction failed:', error);
       setPrediction('Error occurred during prediction.');
@@ -37,35 +47,71 @@ function Crop() {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Crop Prediction</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-        {Object.keys(formData).map((key) => (
-          <div key={key} className="col-span-2">
+    <div className="crop-container" style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
+      <h2>Crop Prediction</h2>
+      <form onSubmit={handleSubmit} className="crop-form">
+        <div className="form-row">
+          <label>User ID</label>
+          <input
+            type="text"
+            name="userId"
+            value={formData.userId}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-row">
+          <label>Location</label>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-row">
+          <label>Soil Quality</label>
+          <input
+            type="text"
+            name="soil_quality"
+            value={formData.soil_quality}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'].map((field) => (
+          <div className="form-row" key={field}>
+            <label>{field.toUpperCase()}</label>
             <input
               type="number"
-              name={key}
-              value={formData[key]}
+              name={field}
+              value={formData[field]}
               onChange={handleChange}
-              placeholder={key.toUpperCase()}
-              className="border p-2 rounded w-full"
               required
             />
           </div>
         ))}
-        <div className="col-span-2">
-          <button 
-            type="submit" 
-            className="w-full bg-green-600 text-white p-2 rounded"
-          >
-            {loading ? 'Predicting...' : 'Predict Crop'}
-          </button>
-        </div>
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Analyzing Data...' : 'Get Crop Recommendation'}
+        </button>
       </form>
 
       {prediction && (
-        <div className="mt-4 bg-green-100 p-4 rounded">
-          <strong>Recommended Crop:</strong> {prediction}
+        <div
+          className="result-box"
+          style={{
+            marginTop: 20,
+            padding: 15,
+            border: '1px solid green',
+            borderRadius: 5,
+            backgroundColor: '#e6ffe6'
+          }}
+        >
+          <h3>Recommended Crop</h3>
+          <p>{prediction}</p>
         </div>
       )}
     </div>

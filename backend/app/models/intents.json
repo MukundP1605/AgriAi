@@ -1,0 +1,198 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hello",
+        "hi",
+        "namaste",
+        "kaise ho",
+        "hey",
+        "good morning",
+        "good evening",
+        "how are you",
+        "what's up",
+        "how's it going",
+        "kaise chal raha hai",
+        "kya haal hai",
+        "salaam"
+      ],
+      "responses": [
+        "Namaste! Kaise madad karun aapki?",
+        "Hello! How can I help you today?",
+        "Hi there! What can I do for you?",
+        "Salaam! How may I assist you?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "bye",
+        "alvida",
+        "see you",
+        "phir milenge",
+        "goodbye",
+        "take care",
+        "see you later",
+        "chalte hain",
+        "milte hain"
+      ],
+      "responses": [
+        "Alvida! Dhyaan rakhna.",
+        "Goodbye! Take care and stay safe.",
+        "See you soon! Have a great day.",
+        "Bye! Looking forward to helping you again."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "thanks",
+        "thank you",
+        "shukriya",
+        "dhanyawaad",
+        "thank you so much",
+        "thanks a lot",
+        "many thanks"
+      ],
+      "responses": [
+        "Aapka swagat hai!",
+        "You're welcome! Happy to help.",
+        "Koi baat nahi, always here for you.",
+        "Glad I could assist you!"
+      ]
+    },
+    {
+      "tag": "crop_recommendation",
+      "patterns": [
+        "mera khet ke liye sabse achha crop kya hai?",
+        "kaunsa fasal lagana chahiye?",
+        "khet ke liye crop suggest karo",
+        "main kya ugau",
+        "what crop should I grow?",
+        "which crop is best for my farm?",
+        "recommend a crop",
+        "suggest a crop for my soil",
+        "what's the best crop for this soil?",
+        "which seeds should I use?",
+        "best crop according to temperature and humidity",
+        "suggest a crop for my farm conditions",
+        "tell me best crop to plant",
+        "which crop will yield better?",
+        "crop advice"
+      ],
+      "responses": [
+        "Aapke khet ke liye mai best crop bata sakta hoon. Batao apne soil details.",
+        "Please share your soil NPK values, temperature, and humidity, then I can recommend a crop.",
+        "Based on your soil and weather, I can suggest the best crop to grow.",
+        "Send me your soil and weather info, I will help you choose the right crop."
+      ]
+    },
+    {
+      "tag": "disease_detection",
+      "patterns": [
+        "leaves pe spot hai",
+        "patto pe daag hai",
+        "kya ye bimari hai",
+        "plant sick lag raha hai",
+        "leaf has dark spots",
+        "is there infection on my plant?",
+        "disease lag gaya kya?",
+        "my plant looks sick",
+        "there are spots on leaves",
+        "how to detect plant disease?",
+        "plant disease symptoms",
+        "how to treat plant disease?",
+        "can you identify the disease in my plant?"
+      ],
+      "responses": [
+        "Kripya patte ki photo upload karo, main bimari pehchaan kar treatment bataunga.",
+        "Please upload a photo of the leaves, I can analyze and tell the disease.",
+        "Send me a picture of the affected plant part, I will try to identify the disease.",
+        "To diagnose the disease accurately, please upload an image."
+      ]
+    },
+    {
+      "tag": "weather_info",
+      "patterns": [
+        "aaj mausam kaisa hai",
+        "kal barish hogi kya?",
+        "weather forecast batao",
+        "what is the weather today?",
+        "temperature kya hai?",
+        "humidity level kya hai?",
+        "is it going to rain tomorrow?",
+        "tell me today's weather update",
+        "weather report"
+      ],
+      "responses": [
+        "Aaj mausam thoda garam hai, barish ka chance kam hai.",
+        "The weather today is warm with low chances of rain.",
+        "Tomorrow might have some rain, please plan your irrigation accordingly.",
+        "Currently, temperature is around 30°C and humidity is about 60%."
+      ]
+    },
+    {
+      "tag": "fertilizer_advice",
+      "patterns": [
+        "fertilizer kaise lagayein?",
+        "best fertilizer for seeds?",
+        "fertilizer quantity kya honi chahiye?",
+        "how to apply fertilizer?",
+        "what fertilizer should I use for my soil?",
+        "NPK balance kaise maintain karein?",
+        "when to apply fertilizer?"
+      ],
+      "responses": [
+        "Use fertilizer according to your soil test report for best results.",
+        "Maintaining NPK balance is important; share your soil report for personalized advice.",
+        "Apply fertilizer based on the crop growth stage for best yield.",
+        "Balanced fertilizer with nitrogen, phosphorus, and potassium is recommended for seeds."
+      ]
+    },
+    {
+      "tag": "irrigation_advice",
+      "patterns": [
+        "khet me paani kaise de?",
+        "best irrigation methods?",
+        "how much water to give to crops?",
+        "when to water the field?",
+        "best irrigation system for farm?",
+        "how to save water in irrigation?"
+      ],
+      "responses": [
+        "Irrigation depends on crop type and weather conditions.",
+        "Drip irrigation saves water and increases efficiency.",
+        "Water quantity should be balanced as per soil and crop needs.",
+        "Avoid overwatering to prevent crop damage."
+      ]
+    },
+    {
+      "tag": "market_prices",
+      "patterns": [
+        "aaj mandi me daam kya hai?",
+        "crop prices today?",
+        "market rate batao",
+        "what are the current crop prices?",
+        "are crop prices increasing?",
+        "market price update please"
+      ],
+      "responses": [
+        "Market prices fluctuate daily; I'll get you the latest info.",
+        "Crop prices depend on demand and supply in the mandi.",
+        "Let me check the latest prices for you.",
+        "Which crop price do you want to know?"
+      ]
+    },
+    {
+      "tag": "fallback",
+      "patterns": [],
+      "responses": [
+        "Sorry bhai, mujhe samajh nahi aaya. Thoda aur bata sakte ho?",
+        "I'm not sure I understood. Can you please rephrase?",
+        "Kshama kijiye, mujhe aapka sawal samajh nahi aaya.",
+        "Please try asking in a different way. I'm here to help!"
+      ]
+    }
+  ]
+}
