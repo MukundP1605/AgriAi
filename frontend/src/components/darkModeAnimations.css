@@ -1,0 +1,112 @@
+/* Dark mode animations */
+.dark .animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.dark .animate-pulse-subtle {
+  animation: pulse-subtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Modern gradient buttons for dark mode */
+.dark .gradient-button {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.dark .gradient-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dark .gradient-button:hover::before {
+  opacity: 1;
+}
+
+/* Glow effect for dark mode */
+.dark .glow-effect {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 24px 0 rgba(139,92,246,0.18), 0 0 8px 0 rgba(16,185,129,0.10);
+  border-radius: 12px;
+  transition: box-shadow 0.3s;
+}
+
+.dark .glow-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(79, 209, 197, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.dark .glow-effect:hover {
+  opacity: 1;
+  box-shadow: 0 0 48px 0 rgba(139,92,246,0.28), 0 0 16px 0 rgba(16,185,129,0.18);
+}
+
+/* Elegant transition for dark mode elements */
+.dark .theme-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover effects for dark mode */
+.dark .rise-on-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .rise-on-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), 0 5px 15px -5px rgba(124, 58, 237, 0.25);
+}
+
+.dark .gradient-button:hover::before {
+  opacity: 1;
+}
+
+/* Dark mode card hover effects */
+.dark .card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}

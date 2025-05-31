@@ -1,0 +1,9 @@
+import { ThemeProvider } from './context/ThemeContext';
+
+function App() {
+  return (
+    <ThemeProvider>
+      {/* Your entire app here */}
+    </ThemeProvider>
+  );
+}

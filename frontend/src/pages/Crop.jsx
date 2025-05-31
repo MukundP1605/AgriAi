@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 function Crop() {
+  const { currentUser, isAuthenticated } = useAuth();
+  
   const [formData, setFormData] = useState({
-    userId: '',
-    location: '',
+    userId: currentUser?.id || '',
+    location: currentUser?.location || '',
     soil_quality: '',
     N: '',
     P: '',
@@ -27,17 +30,43 @@ function Crop() {
     setLoading(true);
     setPrediction('');
     try {
-      console.log('Form Data:', formData);
-
-      // If your backend expects userId as int, convert here:
-      const payload = {
+      console.log('Form Data:', formData);      const payload = {
         ...formData,
         userId: Number(formData.userId)
       };
-
+      
       const response = await axios.post('http://127.0.0.1:8000/predict-crop', payload);
-      // Fix here: use response.data.crop instead of .prediction
-      setPrediction(response.data.crop || 'No prediction returned');
+      const prediction = response.data.crop || 'No prediction returned';
+      setPrediction(prediction);
+      
+      // Save crop plan record for authenticated users
+      if (isAuthenticated && currentUser?.email) {
+        try {
+          // Prepare the crop plan data
+          const cropPlanData = {
+            crop: prediction,
+            location: formData.location,
+            soil_nutrients: {
+              n: formData.N,
+              p: formData.P,
+              k: formData.K,
+              ph: formData.ph
+            },
+            climate: {
+              temperature: formData.temperature,
+              humidity: formData.humidity,
+              rainfall: formData.rainfall
+            }
+          };
+          
+          // Send the crop plan data to the backend API
+          await axios.post('http://127.0.0.1:8000/api/user/history/save-crop-plan-enhanced', cropPlanData, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          });
+        } catch (error) {
+          console.error("Error saving crop plan history:", error);
+        }
+      }
     } catch (error) {
       console.error('Prediction failed:', error);
       setPrediction('Error occurred during prediction.');
@@ -209,28 +238,19 @@ function Crop() {
 
         {/* Results Section */}
         {prediction && (
-          <div className="mt-12 animate-fade-in">
-            <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-3xl shadow-2xl overflow-hidden">
-              <div className="p-8 md:p-12 text-center">
-                <h3 className="text-3xl font-bold text-white mb-6 flex items-center justify-center">
-                  <span className="mr-3 text-4xl">🌱</span>
-                  Recommended Crop
-                </h3>
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-                  <p className="text-2xl font-bold text-white mb-4">
-                    {prediction}
-                  </p>
-                  <p className="text-emerald-100 text-lg">
-                    Based on your soil and environmental conditions, this crop has the highest probability of success.
-                  </p>
-                </div>
-              </div>
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <h3 className="text-lg font-medium">
+                Recommended Crop
+              </h3>
+            </div>
+            <div className="mt-3 text-center">
+              <span className="text-2xl font-bold text-green-600">{prediction}</span>
             </div>
           </div>
         )}
       </div>
-    </div>
-  );
+    </div>  );
 }
 
 export default Crop;

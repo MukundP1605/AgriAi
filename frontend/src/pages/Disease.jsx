@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import imageCompression from 'browser-image-compression';
+import { useAuth } from '../context/AuthContext';
 
 const DiseaseUpload = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { currentUser, isAuthenticated } = useAuth();
 
   const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png'];
   const MAX_SIZE = 5 * 1024 * 1024;
@@ -79,15 +81,42 @@ const DiseaseUpload = () => {
       const formData = new FormData();
       formData.append('file', selectedImage);
       
+      // Get the auth token if user is authenticated
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      
+      if (isAuthenticated) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+      
       console.log("Sending image for analysis...");
       const response = await axios.post('http://127.0.0.1:8000/predict-disease', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
+        headers: headers
+      });      
       console.log("Response:", response.data);
       setResult(response.data);
+      
+      // Save scan record for authenticated users
+      if (isAuthenticated && currentUser?.email) {
+        try {          // Record the scan in the backend
+          const scanData = {
+            result: response.data.predicted_class || "Unknown",
+            confidence: response.data.confidence || 0,
+            image_name: selectedImage.name
+          };
+          
+          // Send the scan data to the backend
+          await axios.post('http://127.0.0.1:8000/api/user/history/save-scan-enhanced', scanData, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          });
+        } catch (error) {
+          console.error("Error saving scan history:", error);
+        }
+      }
     } catch (error) {
       console.error("Error during prediction:", error);
       setResult({ 
@@ -241,9 +270,7 @@ const DiseaseUpload = () => {
                     <p className="text-red-600">{result.error}</p>
                   </div>
                 </div>              </div>
-            )}
-          </div>
-        </div>
+            )}          </div>        </div>
       </div>
     </div>
   );

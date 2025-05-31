@@ -28,7 +28,14 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0fdf4, #ecfdf5, #f0fdfa);
+  background: #f8fafc; /* Light background by default */
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* Dark mode styles */
+.dark body {
+  background-color: #111827;
+  color: #f9fafb;
 }
 
 /* Custom scrollbar */
@@ -49,11 +56,30 @@ body {
   background: #94a3b8;
 }
 
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* Glass morphism effect */
 .glass {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Smooth animations */
@@ -64,4 +90,33 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark theme classes for consistent theming */
+.dark-theme {
+  background: #111827 !important;
+  color: #f9fafb !important;
+}
+
+.dark-chat-container {
+  background: #1f2937 !important;
+  min-height: 100vh;
+}
+
+/* Enhanced chat scrollbar for dark theme */
+.dark-theme ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 3px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }

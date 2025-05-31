@@ -1,5 +1,5 @@
 from app.database import SessionLocal
-from app.models.user import DBUser
+from app.models.users import DBUser
 from passlib.context import CryptContext
 
 # Password hasher
@@ -18,7 +18,7 @@ if existing_user:
     print("❗User already exists.")
 else:
     hashed_password = pwd_context.hash(raw_password)
-    new_user = DBUser(email=email, password=hashed_password)
+    new_user = DBUser(email=email, hashed_password=hashed_password)
     db.add(new_user)
     db.commit()
     print("✅ Test user created successfully.")

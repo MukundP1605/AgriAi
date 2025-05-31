@@ -1,6 +1,6 @@
 import os
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.chatbot_llm import IntentRequest, IntentResponse, IntentClassifier
 from app.utils.redis_client import get_chat_history, append_to_history
@@ -11,6 +11,8 @@ import logging
 import random
 from deep_translator import GoogleTranslator  # Use deep-translator
 from langdetect import detect
+from app.utils.auth import get_current_active_user
+from app.models.users import DBUser
 
 router = APIRouter()
 intent_model = IntentClassifier()
@@ -37,11 +39,12 @@ def detect_language(text: str) -> str:
 @router.post("/chat", response_model=IntentResponse)
 async def chat_endpoint(
     request: IntentRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_active_user)
 ):
     original_message = request.message
-    session_id = request.session_id or "default_session"
-    logger.info(f"Received message: {original_message}")
+    session_id = request.session_id or current_user.email
+    logger.info(f"Received message from {current_user.email}: {original_message}")
 
     # Save user message to Redis (context memory)
     try:
