@@ -49,11 +49,11 @@ const Chat = () => {
       setIsLoading(false);
     }
   };
-
   return (
-    <div className="p-6 max-w-3xl mx-auto h-[90vh] flex flex-col">
-      <h1 className="text-2xl font-semibold mb-4 text-center">AgriAI Chat Assistant</h1>
-      <ChatBot messages={messages} onSendMessage={sendMessage} isLoading={isLoading} />
+    <div className="h-full flex flex-col">
+      <div className="flex-grow overflow-y-auto">
+        <ChatBot messages={messages} onSendMessage={sendMessage} isLoading={isLoading} />
+      </div>
     </div>
   );
 };
