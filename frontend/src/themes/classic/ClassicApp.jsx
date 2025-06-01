@@ -17,13 +17,17 @@ import TestEnhancedFeatures from './pages/TestEnhancedFeatures';
 import EnhancedDashboard from './pages/EnhancedDashboard';
 import ClassicThemeDemo from './components/ClassicThemeDemo';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import Marketplace from './pages/Marketplace';
+import Cart from './pages/Cart';
+import OrderSuccess from './pages/OrderSuccess';
+import OrderHistory from './pages/OrderHistory';
 import { AuthProvider } from '../../context/AuthContext';
 import './components/gridPattern.css';
 import './components/darkModeAnimations.css';
 
 const AppLayout = () => {
   const location = useLocation();  
-  const hideHeroSection = ['/chat', '/crop', '/disease', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup'].includes(location.pathname);  
+  const hideHeroSection = ['/chat', '/crop', '/disease', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup', '/marketplace', '/cart', '/order-history', '/order-success'].includes(location.pathname) || location.pathname.startsWith('/order-success/');  
   // Show footer on all pages
   const hideFooter = [];
   
@@ -62,8 +66,7 @@ const AppLayout = () => {
           </section>
         )}
         </div>
-      <div className={`relative flex-grow ${hideHeroSection ? 'min-h-0' : ''} bg-white text-gray-900`}>
-        <Routes>
+      <div className={`relative flex-grow ${hideHeroSection ? 'min-h-0' : ''} bg-white text-gray-900`}>        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/crop" element={<Crop />} />
           <Route path="/disease" element={<DiseaseUpload />} />
@@ -73,11 +76,17 @@ const AppLayout = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />          <Route path="/history" element={<History />} />
+          <Route path="/settings" element={<Settings />} />          
+          <Route path="/history" element={<History />} />
           <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />
           <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />
-          <Route path="/theme-demo" element={<ClassicThemeDemo />} />          <Route path="*" element={<Login />} />
-        </Routes>      
+          <Route path="/theme-demo" element={<ClassicThemeDemo />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="/order-history" element={<OrderHistory />} />
+          <Route path="*" element={<Login />} />
+        </Routes>
       </div>
       {!hideFooter && <Footer />}
       <ThemeSwitcher />

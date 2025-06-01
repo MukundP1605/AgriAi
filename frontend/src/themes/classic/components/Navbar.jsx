@@ -32,12 +32,12 @@ const Navbar = () => {
       dropdownElement.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
-  
-  const navItems = [
+    const navItems = [
     { path: '/', label: 'Home', icon: '🏠' },
     { path: '/crop', label: 'Crop Planner', icon: '🌾' },
     { path: '/disease', label: 'Disease Detection', icon: '🔍' },
     { path: '/chat', label: 'AI Assistant', icon: '💬' },
+    { path: '/marketplace', label: 'Marketplace', icon: '🛒' },
     { path: '/about', label: 'About', icon: 'ℹ️' }
   ];
 
@@ -102,13 +102,26 @@ const Navbar = () => {
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm font-semibold text-gray-800">{currentUser.fullName || currentUser.email.split('@')[0]}</p>
                         <p className="text-xs text-gray-500 mt-1">{currentUser.email}</p>
-                      </div>
-                      <Link 
+                      </div>                      <Link 
                         to="/profile" 
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         <span className="mr-3">👤</span>
                         Your Profile
+                      </Link>
+                      <Link 
+                        to="/cart" 
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="mr-3">🛒</span>
+                        Your Cart
+                      </Link>
+                      <Link 
+                        to="/order-history" 
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="mr-3">📦</span>
+                        Order History
                       </Link>
                       <Link 
                         to="/history" 

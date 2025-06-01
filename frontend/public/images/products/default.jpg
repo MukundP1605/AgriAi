@@ -1,0 +1,18 @@
+/* Product placeholder SVG in Base64 */
+const base64Image = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTVFN0VCIi8+CjxwYXRoIGQ9Ik0xMDAgNzBDMTEzLjgwNyA3MCAxMjUgODEuMTkyOSAxMjUgOTVDMTI1IDEwOC44MDcgMTEzLjgwNyAxMjAgMTAwIDEyMEM4Ni4xOTI5IDEyMCA3NSAxMDguODA3IDc1IDk1Qzc1IDgxLjE5MjkgODYuMTkyOSA3MCAxMDAgNzBaIiBmaWxsPSIjRDFEM0Q4Ii8+CjxwYXRoIGQ9Ik0xNTAgMTYwSDE0MEMxNDAgMTM3LjkwOSAxMjIuMDkxIDEyMCAxMDAgMTIwQzc3LjkwODYgMTIwIDYwIDEzNy45MDkgNjAgMTYwSDUwQzUwIDEzMi4zODYgNzIuMzg1OCAxMTAgMTAwIDExMEMxMjcuNjE0IDExMCAxNTAgMTMyLjM4NiAxNTAgMTYwWiIgZmlsbD0iI0QxRDNEOCIvPgo8cGF0aCBkPSJNMTQ2IDYwTDEzOCA2MkwxNDYgNjRMMTQ0IDcyTDE0OCA2NkwxNTQgNzBMMTUwIDY0TDE1NiA2MkwxNDggNjBMMTUwIDUyTDE0NiA2MFoiIGZpbGw9IiM5RkE0QjAiLz4KPHBhdGggZD0iTTYyIDQ1TDU0IDQ3TDYyIDQ5TDYwIDU3TDY0IDUxTDcwIDU1TDY2IDQ5TDcyIDQ3TDY0IDQ1TDY2IDM3TDYyIDQ1WiIgZmlsbD0iIzlGQTRCMCIvPgo8cGF0aCBkPSJNMTc0IDEyMEwxNjYgMTIyTDE3NCAxMjRMMTcyIDEzMkwxNzYgMTI2TDE4MiAxMzBMMTc4IDEyNEwxODQgMTIyTDE3NiAxMjBMMTc4IDExMkwxNzQgMTIwWiIgZmlsbD0iIzlGQTRCMCIvPgo8cGF0aCBkPSJNMzIgMTM2TDI0IDEzOEwzMiAxNDBMMzAgMTQ4TDM0IDE0Mkw0MCAxNDZMMzYgMTQwTDQyIDEzOEwzNCAxMzZMMzYgMTI4TDMyIDEzNloiIGZpbGw9IiM5RkE0QjAiLz4KPC9zdmc+Cg==`;
+
+/* Create an actual file from the Base64 */
+const img = new Image();
+img.src = base64Image;
+
+/* Save the image */
+fetch(img.src)
+  .then(res => res.blob())
+  .then(blob => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'default.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });

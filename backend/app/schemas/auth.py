@@ -19,9 +19,8 @@ class UserResponse(BaseModel):
     location: Optional[str] = None
     farm_type: Optional[str] = None
     is_active: bool = True
-    
-    class Config:
-        orm_mode = True
+class Config:
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str

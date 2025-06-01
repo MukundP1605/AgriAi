@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+
 const Home = () => {
+
   const features = [
     {
       icon: '🌾',
@@ -25,13 +27,20 @@ const Home = () => {
       gradient: 'from-purple-500 to-pink-600'
     },
     {
+      icon: '🛒',
+      title: 'Marketplace',
+      description: 'Shop for premium agricultural products, tools, and equipment for your farming needs.',
+      path: '/marketplace',
+      gradient: 'from-amber-500 to-orange-600'
+    },
+    {
       icon: '📊',
       title: 'Farm Analytics',
       description: 'Track your farming progress and get insights to optimize your agricultural practices.',
       path: '/forms',
       gradient: 'from-orange-500 to-red-600'
     }
-  ];  return (
+  ];return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">{/* Welcome Section */}
@@ -45,44 +54,86 @@ const Home = () => {
               <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
               Now powered by advanced AI models
             </div>
-          </div>{/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-            {features.map((feature, index) => (
-              <Link
-                key={index}
-                to={feature.path}
-                className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-[1.02] border border-gray-100"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-15 transition-opacity duration-500`}></div>
+          </div>          {/* Features Grid - Optimized 3-2 Layout */}
+          <div className="mb-20">
+            {/* Top row - 3 cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              {features.slice(0, 3).map((feature, index) => (
+                <Link
+                  key={index}
+                  to={feature.path}
+                  className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-[1.02] border border-gray-100"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-15 transition-opacity duration-500`}></div>
 
-                <div className="relative p-8">
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-r ${feature.gradient} mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
-                    <span className="text-4xl">{feature.icon}</span>
-                  </div>                  <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-600 transition-colors duration-300">
-                    {feature.title}
-                  </h3>
+                  <div className="relative p-8">
+                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-r ${feature.gradient} mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                      <span className="text-4xl">{feature.icon}</span>
+                    </div>                    
 
-                  <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    {feature.description}
-                  </p>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-600 transition-colors duration-300">
+                      {feature.title}
+                    </h3>
 
-                  <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700">
-                    <span>Get Started</span>
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" 
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                    <p className="text-gray-600 leading-relaxed mb-6 text-lg">
+                      {feature.description}
+                    </p>
+
+                    <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                      <span>Get Started</span>
+                      <svg className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </div>
                   </div>
-                </div>
 
-                {/* Floating visual effects */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-emerald-200 to-green-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
-                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-200 to-cyan-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
-              </Link>
-            ))}
-          </div>
+                  {/* Floating visual effects */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-emerald-200 to-green-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                  <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-200 to-cyan-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                </Link>
+              ))}
+            </div>
 
-          {/* CTA Section */}
+            {/* Bottom row - 2 cards centered */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {features.slice(3, 5).map((feature, index) => (
+                <Link
+                  key={index + 3}
+                  to={feature.path}
+                  className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-[1.02] border border-gray-100"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-15 transition-opacity duration-500`}></div>
+
+                  <div className="relative p-8">
+                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-r ${feature.gradient} mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                      <span className="text-4xl">{feature.icon}</span>
+                    </div>                    
+
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-600 transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+
+                    <p className="text-gray-600 leading-relaxed mb-6 text-lg">
+                      {feature.description}
+                    </p>
+
+                    <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                      <span>Get Started</span>
+                      <svg className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Floating visual effects */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-emerald-200 to-green-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                  <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-200 to-cyan-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                </Link>
+              ))}
+            </div>
+          </div>{/* CTA Section */}
           <div className="relative bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 rounded-3xl shadow-2xl overflow-hidden">
             <div className="relative px-8 py-16 sm:px-12 sm:py-20 text-center">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight">
@@ -107,9 +158,9 @@ const Home = () => {
                   <span>Try AI Assistant</span>
                   <span className="ml-3 text-xl">🤖</span>
                 </Link>
-              </div>
-              
-            </div>          </div>        </div>
+              </div>            
+            </div>
+          </div></div>
             <Footer />
       </div>
     </>

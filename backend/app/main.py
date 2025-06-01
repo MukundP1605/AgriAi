@@ -18,6 +18,7 @@ from app.routes.chatbot import router as chatbot_router
 from app.routes.auth_router import router as auth_router
 from app.routes.user_history import router as history_router
 from app.routes.user_profile import router as profile_router
+from app.routes.marketplace import router as marketplace_router
 from app.database import Base, engine, get_db, SessionLocal
 from sqlalchemy.orm import Session
 from app.utils.redis_client import redis_client
@@ -70,6 +71,7 @@ app.include_router(chatbot_router, prefix="/api/chatbot", tags=["Chatbot"])
 app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(history_router, prefix="/api/user/history", tags=["User History"])
 app.include_router(profile_router, prefix="/api/user/profile", tags=["User Profile"])
+app.include_router(marketplace_router, prefix="/api/marketplace", tags=["Marketplace"])
 
 @app.on_event("startup")
 async def startup_event():
