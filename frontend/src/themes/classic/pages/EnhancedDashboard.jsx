@@ -3,8 +3,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import UserProfile from '../components/Profile/UserProfile';
 import EnhancedDashboard from '../components/Dashboard/EnhancedDashboard';
-
-
+// import './EnhancedDashboard.css'; // Optional: Import custom styles for the dashboard
+import Footer from '../components/Footer';
 const EnhancedDashboardPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -18,14 +18,12 @@ const EnhancedDashboardPage = () => {
 
   if (!isAuthenticated) {
     return null;
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+  }  return (
+    <div className="flex-grow bg-gradient-to-br from-slate-50 to-emerald-50">
+      <div className="max-w-7xl mx-auto px-4 py-8 mb-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Enhanced AgriAI Dashboard</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Advanced AgriAI Dashboard</h1>
           <p className="text-gray-600">Comprehensive view of your agricultural activities and insights</p>
         </div>
 
@@ -71,7 +69,9 @@ const EnhancedDashboardPage = () => {
             </div>
           )}
         </div>
-      </div>    
+      </div>   
+  
+      <Footer />
     </div>
   );
 };

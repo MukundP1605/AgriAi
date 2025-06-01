@@ -11,7 +11,7 @@ import {
 import { Link } from "react-router-dom";
 
 const Footer = () => {  return (
-    <footer className="w-full mt-12 bg-gray-950 dark:bg-dark-200 text-white relative overflow-hidden border-t-2 border-emerald-500/50 shadow-2xl z-10 transition-colors duration-300 dark:modern-card">
+    <footer className="w-full mt-auto bg-gray-950 dark:bg-dark-200 text-white relative overflow-hidden border-t-2 border-emerald-500/50 shadow-2xl z-10 transition-colors duration-300 dark:modern-card">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10"></div>
       <div className="mx-auto max-w-7xl px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 relative">
         {/* Branding */}

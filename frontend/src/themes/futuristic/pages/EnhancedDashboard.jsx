@@ -16,16 +16,38 @@ const EnhancedDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/user/dashboard', {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+      
+      const response = await fetch('http://127.0.0.1:8000/api/user/history/dashboard?days=30', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-      const data = await response.json();
-      setDashboardData(data);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Dashboard API error:', response.status, errorText);
+        throw new Error(`Failed to fetch dashboard data: ${errorText}`);
+      }
+        const data = await response.json();
+      
+      // Validate and transform the data to match our state structure
+      setDashboardData({
+        totalRecommendations: data.total_crop_plans || 0,
+        totalDetections: data.total_scans || 0,
+        recentActivity: data.recent_activity || [],
+        popularCrops: data.popular_crops || [],
+        diseaseStats: data.disease_stats || []
+      });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }

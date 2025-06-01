@@ -4,7 +4,7 @@ const Card = ({ children, className = '', ...props }) => {
   return (
     <div
       className={`
-        bg-white rounded-lg border border-gray-200 shadow-sm
+        bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700 shadow-xl
         ${className}
       `}
       {...props}
@@ -16,7 +16,7 @@ const Card = ({ children, className = '', ...props }) => {
 
 const CardHeader = ({ children, className = '' }) => {
   return (
-    <div className={`px-6 py-4 border-b border-gray-200 ${className}`}>
+    <div className={`px-6 py-4 border-b border-gray-700 ${className}`}>
       {children}
     </div>
   );

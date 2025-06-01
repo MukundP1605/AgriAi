@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import Footer from '../components/Footer';
 const Home = () => {
   const features = [
     {
@@ -108,7 +108,9 @@ const Home = () => {
                   <span className="ml-3 text-xl">🤖</span>
                 </Link>
               </div>
+              
             </div>          </div>        </div>
+            <Footer />
       </div>
     </>
   );

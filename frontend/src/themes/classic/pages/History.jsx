@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+import Footer from '../components/Footer';
 
 const History = () => {
   const { currentUser, isAuthenticated } = useAuth();
@@ -110,11 +110,14 @@ const History = () => {
       console.error('Error exporting data:', error);
     }
   };
+
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto mt-12 p-8 min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
-        <div className="bg-white rounded-xl shadow-md p-8">
-          <h2 className="text-2xl font-bold mb-4 text-center text-gray-700">Loading history...</h2>
+      <div className="flex-grow bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="max-w-7xl mx-auto mt-12 p-8 mb-12">
+          <div className="bg-white rounded-xl shadow-md p-8">
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-700">Loading history...</h2>
+          </div>
         </div>
       </div>
     );
@@ -297,7 +300,7 @@ const History = () => {
     </div>
   );
   return (
-    <div className="max-w-7xl mx-auto mt-12 p-8 min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+    <div className="max-w-7xl mx-auto mt-12 p-8 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
       <div className="bg-white rounded-xl shadow-md p-8">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">Activity Dashboard</h2>
@@ -380,9 +383,9 @@ const History = () => {
 
 export default function HistoryPage() {
   return (
-    <>
+    <div className="flex-grow">
       <History />
-      
-    </>
+        <Footer />
+    </div>
   );
 }

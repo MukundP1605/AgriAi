@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import ThemeToggle from '../../../components/ThemeToggle';
 
 const Navbar = () => {
   const location = useLocation();
@@ -42,8 +41,7 @@ const Navbar = () => {
         <div>
           <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
             {currentUser.fullName || currentUser.email.split('@')[0]}
-          </button>
-          {isUserMenuOpen && (
+          </button>          {isUserMenuOpen && (
             <div>
               <Link to="/profile">Profile</Link>
               <Link to="/history">History</Link>
@@ -52,14 +50,12 @@ const Navbar = () => {
               <button onClick={handleLogout}>Logout</button>
             </div>
           )}
-          <ThemeToggle />
         </div>
       ) : (
         <div>
           {authLinks.map((item) => (
             <Link key={item.path} to={item.path}>{item.label}</Link>
           ))}
-          <ThemeToggle />
         </div>
       )}
     </nav>

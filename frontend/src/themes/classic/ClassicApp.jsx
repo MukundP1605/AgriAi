@@ -24,11 +24,13 @@ import './components/darkModeAnimations.css';
 const AppLayout = () => {
   const location = useLocation();  
   const hideHeroSection = ['/chat', '/crop', '/disease', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup'].includes(location.pathname);  
-  const hideFooter = ['/chat', '/crop', '/disease'].includes(location.pathname);
-    return (
+  // Show footer on all pages
+  const hideFooter = [];
+  
+  return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
       <Navbar />      
-      <div className="flex-grow">
+      <div className="flex-grow flex flex-col">
       {!hideHeroSection && (
         <section className="bg-gradient-radial from-green-400 via-green-500 to-green-600 text-white py-16" style={{background: 'radial-gradient(ellipse at center, #16a34a 0%, #15803d 70%, #14532d 100%)'}}>
           <div className="max-w-4xl mx-auto px-4 text-center">
@@ -57,9 +59,10 @@ const AppLayout = () => {
               </a>
             </div>
           </div>
-        </section>
-      )}
-      <div className={`relative ${hideHeroSection ? 'h-[calc(100vh-4rem)]' : ''} bg-white text-gray-900`}>
+          </section>
+        )}
+        </div>
+      <div className={`relative flex-grow ${hideHeroSection ? 'min-h-0' : ''} bg-white text-gray-900`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/crop" element={<Crop />} />
@@ -75,7 +78,6 @@ const AppLayout = () => {
           <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />
           <Route path="/theme-demo" element={<ClassicThemeDemo />} />          <Route path="*" element={<Login />} />
         </Routes>      
-      </div>
       </div>
       {!hideFooter && <Footer />}
       <ThemeSwitcher />

@@ -158,15 +158,13 @@ const Profile = () => {
     }
   };
     // If no user is logged in or loading, show placeholder
-  if (!currentUser || loading) {
-    return (
+  if (!currentUser || loading) {    return (
       <>
-        <div className="max-w-4xl mx-auto mt-12 p-8">
+        <div className="max-w-4xl mx-auto mt-12 p-8 min-h-[calc(100vh-4rem)]">
           <div className="bg-white rounded-xl shadow-md p-8">
             <h2 className="text-2xl font-bold mb-4 text-center text-gray-700">Loading profile...</h2>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -193,10 +191,8 @@ const Profile = () => {
     { value: 'intermediate', label: 'Intermediate (1-5 years)' },
     { value: 'experienced', label: 'Experienced (5-15 years)' },
     { value: 'expert', label: 'Expert (> 15 years)' }
-  ];
-    return (
-    <>
-      <div className="max-w-6xl mx-auto mt-12 p-8 min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+  ];    return (    <div className="flex-grow bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+      <div className="max-w-6xl mx-auto mt-12 p-8 mb-12">
         <div className="bg-white rounded-xl shadow-md p-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold text-emerald-700">Your Profile</h2>
@@ -568,13 +564,13 @@ const Profile = () => {
                       <span className="text-sm text-gray-500">{activity.date}</span>
                     </div>
                   ))}
-                </div>
-              </div>
+                </div>              </div>
             )}
           </div>
-        </div>      </div>
+        </div>
+      </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

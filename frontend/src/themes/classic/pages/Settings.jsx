@@ -274,8 +274,9 @@ const Settings = () => {
             </div>
           </div>
         </div>
+        
       </div>
-      <Footer />
+    <Footer />
     </>  );
 };
 
