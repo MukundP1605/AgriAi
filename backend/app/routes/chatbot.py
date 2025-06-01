@@ -57,19 +57,27 @@ async def call_openrouter_api(messages, selected_model):
     if not OPENROUTER_API_KEY:
         logger.error("OpenRouter API key not found")
         raise ValueError("OpenRouter API key is required")
+        
+    # OpenRouter now uses Clerk for authentication and requires JWT token format
+    # Format should be "Bearer " followed by the JWT token (sk-or-v1-...)
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",  # Add "Bearer " prefix
         "Content-Type": "application/json",
         "HTTP-Referer": "https://github.com/AgriAI/AgriAI", 
         "X-Title": "AgriAI Chatbot"
     }
-    logger.debug(f"Request headers: {headers}")
+    
+    # Log only non-sensitive header information
+    safe_headers = {k: v if k != "Authorization" else f"{v[:15]}..." for k, v in headers.items()}
+    logger.debug(f"Request headers: {safe_headers}")
+    
     payload = {
         "model": selected_model,
         "messages": messages,
         "temperature": 0.7,
         "max_tokens": 1024
     }
+    
     logger.debug(f"Making request to {OPENROUTER_URL} with model: {selected_model}")
     async with httpx.AsyncClient(timeout=15.0) as client:
         try:
@@ -80,14 +88,30 @@ async def call_openrouter_api(messages, selected_model):
                 headers=headers
             )
             logger.debug(f"Response status: {response.status_code}")
-            logger.debug(f"Response headers: {response.headers}")
+            
+            # Log headers but exclude any sensitive information
+            response_headers = {k: v for k, v in response.headers.items() 
+                              if k.lower() not in ['authorization', 'set-cookie', 'cookie']}
+            logger.debug(f"Response headers: {response_headers}")
+            
+            # If we get a 401 Unauthorized, log detailed information
+            if response.status_code == 401:
+                logger.error("Authentication failed with OpenRouter API (401 Unauthorized)")
+                logger.error("This could be due to an invalid or expired API key")
+                logger.error("OpenRouter now uses Clerk for authentication and requires JWT token format")
+                logger.error(f"Response error: {response.text}")
+            
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
             logger.error(f"HTTP error occurred: {str(e)}")
             if e.response:
+                logger.error(f"Response status: {e.response.status_code}")
                 logger.error(f"Response content: {e.response.text}")
-                logger.error(f"Request headers sent: {e.response.request.headers}")
+                # Log only non-sensitive header information
+                safe_request_headers = {k: v if k != "Authorization" else f"{v[:15]}..." 
+                                      for k, v in e.response.request.headers.items()}
+                logger.error(f"Request headers sent: {safe_request_headers}")
             raise
 
 @router.post("/chat", response_model=IntentResponse)
@@ -289,9 +313,65 @@ You are designed to **assist, educate, and empower farmers** using science, data
 @router.get("/test-env")
 async def test_environment():
     logger.debug("Testing environment variables...")
+    
+    # Check if API key is in correct format (starts with sk-or-v1-)
+    is_correct_format = False
+    if OPENROUTER_API_KEY:
+        is_correct_format = OPENROUTER_API_KEY.startswith("sk-or-v1-")
+    
     return {
         "api_key_present": bool(OPENROUTER_API_KEY),
         "api_key_length": len(OPENROUTER_API_KEY) if OPENROUTER_API_KEY else 0,
         "api_key_prefix": OPENROUTER_API_KEY[:10] + "..." if OPENROUTER_API_KEY else None,
-        "environment": os.environ.get("ENV", "development")
+        "api_key_format_correct": is_correct_format,
+        "environment": os.environ.get("ENV", "development"),
+        "openrouter_url": OPENROUTER_URL,
+        "auth_note": "OpenRouter now uses Clerk for authentication. API key should be in JWT format starting with sk-or-v1-"
     }
+
+@router.get("/test-openrouter")
+async def test_openrouter_connection():
+    """
+    Test endpoint to check connection to OpenRouter API.
+    This is useful for debugging authentication issues.
+    """
+    logger.debug("Testing OpenRouter API connection...")
+    
+    if not OPENROUTER_API_KEY:
+        return {
+            "status": "error",
+            "message": "OpenRouter API key not found in environment variables",
+            "details": "Check your .env file or environment variables"
+        }
+    
+    # Simple test message
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello, are you working?"}
+    ]
+    
+    selected_model = FREE_MODELS[0]  # Use the first model in the list
+    
+    try:
+        # Test OpenRouter API
+        data = await call_openrouter_api(messages, selected_model)
+        
+        # If we get here, the API call was successful
+        return {
+            "status": "success",
+            "message": "Successfully connected to OpenRouter API",
+            "model_used": selected_model,
+            "api_response": {
+                "id": data.get("id", ""),
+                "model": data.get("model", ""),
+                "response_snippet": data.get("choices", [{}])[0].get("message", {}).get("content", "")[:50] + "..."
+            }
+        }
+    except Exception as e:
+        # If there's an error, return it
+        return {
+            "status": "error",
+            "message": f"Error connecting to OpenRouter API: {str(e)}",
+            "api_key_prefix": OPENROUTER_API_KEY[:10] + "..." if OPENROUTER_API_KEY else None,
+            "details": "OpenRouter now uses Clerk for authentication. Please verify your API key is in the correct format."
+        }
