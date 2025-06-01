@@ -1,0 +1,253 @@
+/* Modern Chat Interface - Futuristic Theme */
+
+/* Reset any external styles that might interfere */
+.modern-chat-container,
+.modern-chat-container * {
+  box-sizing: border-box;
+}
+
+.modern-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #111827 !important;
+  color: #f9fafb !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Chat Messages Area */
+.chat-messages-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #111827 !important;
+}
+
+/* Welcome Section */
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.quick-prompt-bubble {
+  background: #374151;
+  color: #e5e7eb;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #4b5563;
+}
+
+.quick-prompt-bubble:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+  transform: translateY(-1px);
+}
+
+/* Messages List */
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Message Containers */
+.message-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 70%;
+}
+
+.message-container.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-container.bot {
+  align-self: flex-start;
+}
+
+/* Avatars */
+.bot-avatar,
+.user-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bot-avatar {
+  background: #10B981;
+  color: white;
+}
+
+.user-avatar {
+  background: #3B82F6;
+  color: white;
+}
+
+/* Message Bubbles */
+.message-bubble {
+  padding: 1rem;
+  border-radius: 16px;
+  max-width: 100%;
+}
+
+.user .message-bubble {
+  background: #3B82F6;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.bot .message-bubble {
+  background: #1F2937;
+  color: #E5E7EB;
+  border-bottom-left-radius: 4px;
+}
+
+/* Input Area */
+.chat-input-area {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: #1F2937;
+  border-top: 1px solid #374151;
+  gap: 0.5rem;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #111827;
+  border-radius: 8px;
+  padding: 0.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1rem;
+  color: #F9FAFB;
+  font-size: 16px;
+  outline: none;
+}
+
+.chat-input::placeholder {
+  color: #9CA3AF;
+}
+
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #3B82F6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.send-button:hover {
+  background: #2563EB;
+}
+
+.send-button:disabled {
+  background: #4B5563;
+  cursor: not-allowed;
+}
+
+/* Loading Animation */
+.thinking {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #1F2937;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  margin-left: 3rem;
+}
+
+.thinking-dot {
+  width: 8px;
+  height: 8px;
+  background: #9CA3AF;
+  border-radius: 50%;
+  animation: thinking-animation 1.4s infinite ease-in-out both;
+}
+
+.thinking-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes thinking-animation {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Error Display */
+.error-message {
+  padding: 1rem;
+  background: #FEE2E2;
+  color: #B91C1C;
+  border-radius: 8px;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 100%;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .message-container {
+    max-width: 85%;
+  }
+
+  .welcome-content {
+    gap: 0.75rem;
+  }
+
+  .chat-input-area {
+    padding: 0.75rem;
+  }
+}

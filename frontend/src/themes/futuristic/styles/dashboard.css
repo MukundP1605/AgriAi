@@ -1,0 +1,304 @@
+/* =========================
+   Futuristic Dashboard Styles
+========================= */
+
+:root {
+  --neon-cyan: #00ffff;
+  --neon-purple: #9945ff;
+  --cyan-alpha: rgba(0, 255, 255, 0.1);
+  --cyan-scrollbar: rgba(6, 182, 212, 0.4);
+  --cyan-scrollbar-hover: rgba(6, 182, 212, 0.6);
+}
+
+/* Performance optimization classes */
+.low-performance-mode {
+  --stars-count: 1000;
+  --animation-speed: 0.5;
+}
+
+.high-performance-mode {
+  --stars-count: 2000;
+  --animation-speed: 1;
+}
+
+/* Reduced motion preference handling */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cyan-scrollbar) transparent;
+  overflow-y: scroll;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--cyan-scrollbar);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan-scrollbar-hover);
+}
+
+/* Glowing text animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+.glow-text {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Futuristic button hover effects */
+.futuristic-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.futuristic-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--cyan-alpha), transparent);
+  transition: left 0.5s;
+}
+
+.futuristic-button:hover::before,
+.futuristic-button:focus-visible::before {
+  left: 100%;
+}
+
+/* Panel hover glow effect */
+.panel-glow {
+  position: relative;
+}
+
+.panel-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.panel-glow:hover::after,
+.panel-glow:focus-within::after {
+  opacity: 0.5;
+}
+
+/* Animated grid background */
+.grid-background {
+  background-image:
+    linear-gradient(var(--cyan-alpha) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cyan-alpha) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+
+/* Loading spinner for 3D canvas */
+.canvas-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 255, 255, 0.1);
+  border-top: 3px solid var(--neon-cyan);
+  border-radius: 50%;
+  animation: spin 1s linear infinite, spinner-color 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinner-color {
+  0%, 100% { border-top-color: var(--neon-cyan); }
+  50% { border-top-color: var(--neon-purple); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .sidebar-mobile {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    will-change: transform;
+    position: fixed;
+    z-index: 50;
+    height: 100vh;
+    width: 16rem;
+  }
+
+  .sidebar-mobile.open {
+    transform: translateX(0);
+  }
+  
+  .dashboard-main {
+    margin-left: 0 !important;
+    padding: 1rem !important;
+  }
+  
+  .topbar-mobile {
+    padding-left: 1rem !important;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex !important;
+  }
+  
+  .quick-actions-bar {
+    left: 1rem !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+    padding: 0.75rem !important;
+    flex-direction: column !important;
+  }
+  
+  .quick-actions-bar .actions-buttons {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .dashboard-main {
+    margin-left: 4rem !important;
+  }
+  
+  .sidebar-collapsed {
+    width: 4rem !important;
+  }
+  
+  .sidebar-collapsed .nav-text {
+    display: none;
+  }
+  
+  .sidebar-collapsed .nav-icon {
+    margin-right: 0;
+  }
+  
+  .quick-actions-bar {
+    left: 4.5rem !important;
+  }
+}
+
+/* Battery optimization for mobile */
+@media (max-width: 768px) and (max-device-width: 812px) and (orientation: portrait) {
+  .reduced-effects {
+    opacity: 0.7 !important;
+  }
+  
+  .no-animation {
+    animation: none !important;
+    transform: none !important;
+  }
+  
+  .canvas-3d {
+    display: none !important;
+  }
+  
+  .static-background {
+    display: block !important;
+  }
+}
+
+/* High DPI displays */
+@media (min-resolution: 2dppx) {
+  .sharp-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Dark mode explicit preferences */
+@media (prefers-color-scheme: dark) {
+  .theme-adaptive {
+    --bg-color: #0a0a0f;
+    --text-color: #e0e0e0;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .theme-adaptive {
+    --bg-color: #0a0a0f; /* Still dark for futuristic theme */
+    --text-color: #e0e0e0;
+  }
+}
+
+/* Fallback style for when WebGL fails */
+.static-background {
+  display: none;
+  background: linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+}
+
+/* Optimized animations for reduced performance impact */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.subtle-pulse {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}

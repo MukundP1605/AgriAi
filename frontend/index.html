@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AgriAI</title>
+    <!-- Preload theme class to prevent flicker -->
+    <script>
+      const savedTheme = localStorage.getItem('uiTheme') || 'classic';
+      document.documentElement.classList.add(`theme-${savedTheme}`);
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add(`theme-${savedTheme}`);
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>

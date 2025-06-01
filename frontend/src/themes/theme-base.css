@@ -1,0 +1,37 @@
+/* Base styles for theme system */
+:root {
+  --theme-transition-duration: 0.5s;
+}
+
+/* Add transition to all elements */
+* {
+  transition: background-color var(--theme-transition-duration),
+              color var(--theme-transition-duration),
+              border-color var(--theme-transition-duration),
+              box-shadow var(--theme-transition-duration);
+}
+
+/* Theme root containers */
+html.theme-classic,
+.theme-classic {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+html.theme-futuristic,
+.theme-futuristic {
+  background-color: #121212;
+  color: #e5e7eb;
+}
+
+/* Ensure full-height themes */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fix for transitions */
+.transition-none * {
+  transition: none !important;
+}

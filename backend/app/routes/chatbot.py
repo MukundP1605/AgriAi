@@ -1,33 +1,49 @@
 import os
+import logging
+from dotenv import load_dotenv
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.models.chatbot_llm import IntentRequest, IntentResponse, IntentClassifier
-from app.utils.redis_client import get_chat_history, append_to_history
-from app.database import get_db
-from app.chatlog import ChatLog
 import redis
-import logging
 import random
 from deep_translator import GoogleTranslator  # Use deep-translator
 from langdetect import detect
 from app.utils.auth import get_current_active_user
 from app.models.users import DBUser
 
+# Configure logging for debug output
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Load environment variables and verify
+load_dotenv()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+logger.debug(f"API Key loaded: {'Successfully loaded' if OPENROUTER_API_KEY else 'Failed to load'}")
+logger.debug(f"API Key starts with: {OPENROUTER_API_KEY[:10] if OPENROUTER_API_KEY else 'None'}")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+from app.models.chatbot_llm import IntentRequest, IntentResponse, IntentClassifier
+from app.utils.redis_client import get_chat_history, append_to_history
+from app.database import get_db
+from app.chatlog import ChatLog
+
 router = APIRouter()
 intent_model = IntentClassifier()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-
 logger = logging.getLogger(__name__)
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if OPENROUTER_API_KEY:
+    logger.info("OpenRouter API key loaded successfully")
+else:
+    logger.error("Failed to load OpenRouter API key")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 FREE_MODELS = [
     "meta-llama/llama-3.3-8b-instruct:free",  # This one works   # This works but has rate limits
     "deepseek/deepseek-prover-v2:free",
     "google/gemini-2.0-flash-exp:free",
     "deepseek/deepseek-chat-v3-0324:free"  # Another reliable option
-    
 ]
 
 def detect_language(text: str) -> str:
@@ -36,12 +52,57 @@ def detect_language(text: str) -> str:
     except Exception:
         return "en"
 
+async def call_openrouter_api(messages, selected_model):
+    logger.debug(f"Starting OpenRouter API call with key prefix: {OPENROUTER_API_KEY[:10]}...")
+    if not OPENROUTER_API_KEY:
+        logger.error("OpenRouter API key not found")
+        raise ValueError("OpenRouter API key is required")
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/AgriAI/AgriAI", 
+        "X-Title": "AgriAI Chatbot"
+    }
+    logger.debug(f"Request headers: {headers}")
+    payload = {
+        "model": selected_model,
+        "messages": messages,
+        "temperature": 0.7,
+        "max_tokens": 1024
+    }
+    logger.debug(f"Making request to {OPENROUTER_URL} with model: {selected_model}")
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        try:
+            logger.debug("Sending request to OpenRouter...")
+            response = await client.post(
+                OPENROUTER_URL,
+                json=payload,
+                headers=headers
+            )
+            logger.debug(f"Response status: {response.status_code}")
+            logger.debug(f"Response headers: {response.headers}")
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPError as e:
+            logger.error(f"HTTP error occurred: {str(e)}")
+            if e.response:
+                logger.error(f"Response content: {e.response.text}")
+                logger.error(f"Request headers sent: {e.response.request.headers}")
+            raise
+
 @router.post("/chat", response_model=IntentResponse)
 async def chat_endpoint(
     request: IntentRequest,
     db: Session = Depends(get_db),
     current_user: DBUser = Depends(get_current_active_user)
 ):
+    """
+    Chat endpoint for AgriAI assistant.
+    - Detects user intent via local model.
+    - If fallback, calls OpenRouter LLM API.
+    - Maintains chat context in Redis.
+    - Supports multilingual, agriculture-only domain.
+    """
     original_message = request.message
     session_id = request.session_id or current_user.email
     logger.info(f"Received message from {current_user.email}: {original_message}")
@@ -66,13 +127,15 @@ async def chat_endpoint(
             # Fetch last 10 messages from Redis for context
             try:
                 history = get_chat_history(session_id)
-                context_messages = history[-10:]
+                context_messages = history[-10:] if history else []
             except redis.exceptions.ConnectionError:
-                context_messages = [f"user: {original_message}"]            # Prepare messages payload for OpenRouter
+                context_messages = [f"user: {original_message}"]
+
+            # Prepare messages payload for OpenRouter
             messages = [
-    {
-        "role": "system",
-        "content": f"""
+                {
+                    "role": "system",
+                    "content": f"""
 You are **AgriAI**, an intelligent, multilingual virtual assistant trained exclusively in agriculture.
 
 🌐 **Language Policy**
@@ -128,9 +191,11 @@ Also explain:
 ---
 
 You are designed to **assist, educate, and empower farmers** using science, data, and modern tools. Be accurate, be humble, and stay helpful.
-"""    }
-]
+"""
+                }
+            ]
 
+            # Append past context messages from Redis
             for entry in context_messages:
                 try:
                     role, content = entry.split(": ", 1)
@@ -144,53 +209,61 @@ You are designed to **assist, educate, and empower farmers** using science, data
             # Add current user message (no translation yet)
             messages.append({"role": "user", "content": original_message})
 
-            headers = {
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://agriai-app.com",  # Add this header to help with rate limits
-                "X-Title": "AgriAI Farming Assistant"      # Add this header to identify your app
-            }
-            
+            # Verify API key is loaded
+            if not OPENROUTER_API_KEY:
+                logger.error("OpenRouter API key not found in environment variables")
+                return IntentResponse(
+                    reply="Configuration error: API key not found. Please contact support.",
+                    intent="error"
+                )
+
             selected_model = random.choice(FREE_MODELS)
             logger.info(f"Using model: {selected_model}")
-            
-            payload = {
-                "model": selected_model,  # Use the randomly selected model
-                "messages": messages,
-                "temperature": 0.7,
-                "max_tokens": 1024  # Specify max tokens to control response length
-            }
 
-            logger.debug(f"Sending to OpenRouter: {payload}")
+            try:
+                data = await call_openrouter_api(messages, selected_model)
+                reply = data["choices"][0]["message"]["content"]
 
-            async with httpx.AsyncClient(timeout=15) as client:
-                response = await client.post(OPENROUTER_URL, json=payload, headers=headers)
+            except httpx.HTTPStatusError as e:
+                error_message = f"OpenRouter API error: {e.response.text if e.response else str(e)}"
+                logger.error(error_message)
 
-                # If OpenRouter is unavailable, fall back to a helpful default response
-                if response.status_code != 200:
-                    error_message = f"OpenRouter API error: {response.text}"
-                    logger.error(error_message)
-                    
-                    # Check if it's a rate limit error
-                    if "rate limit" in response.text.lower() or "429" in response.text:
-                        reply = f"I'm sorry, our AI service is currently at capacity. Here's what I can tell you based on your question:\n\n"
-                        
-                        # Add helpful default responses for common agricultural topics
-                        if any(term in request.message.lower() for term in ["n:", "p:", "k:", "npk", "temperature", "humidity", "rainfall", "ph"]) or request.message.count(":") >= 3:
-                            reply += "For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations. Based on the data you provided, you might want to try our crop prediction endpoint directly."
-                        elif "crop" in request.message.lower() or "plant" in request.message.lower():
-                            reply += "For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations."
-                        elif "disease" in request.message.lower() or "spot" in request.message.lower() or "sick" in request.message.lower():
-                            reply += "For plant disease detection, please upload a photo of the affected plant through our disease detection endpoint for accurate diagnosis."
-                        else:
-                            reply += "Please try again later when our AI service is available again."
+                if e.response and e.response.status_code == 429:
+                    # Rate limit hit - try a different model
+                    remaining_models = [m for m in FREE_MODELS if m != selected_model]
+                    if remaining_models:
+                        selected_model = random.choice(remaining_models)
+                        logger.info(f"Rate limit hit, retrying with model: {selected_model}")
+                        try:
+                            data = await call_openrouter_api(messages, selected_model)
+                            reply = data["choices"][0]["message"]["content"]
+                        except Exception:
+                            reply = "I apologize, but our AI service is currently at capacity. Please try again in a few minutes."
                     else:
-                        reply = "Sorry, our AI service is temporarily unavailable. Please try again later."
+                        reply = "I apologize, but our AI service is currently at capacity. Please try again in a few minutes."
                 else:
-                    data = response.json()
-                    reply = data["choices"][0]["message"]["content"]
+                    reply = "I apologize, but I'm having trouble accessing our AI service. Please try again later."
 
-                intent = "llama_fallback"
+            except (httpx.RequestError, httpx.TimeoutException) as e:
+                logger.error(f"Network error with OpenRouter API: {str(e)}")
+                reply = "I apologize, but I'm having trouble connecting to our AI service. Please try again later."
+
+                # Add helpful default responses for common agricultural topics
+                msg_lower = request.message.lower()
+                if any(term in msg_lower for term in ["n:", "p:", "k:", "npk", "temperature", "humidity", "rainfall", "ph"]) or request.message.count(":") >= 3:
+                    reply += " For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations. Based on the data you provided, you might want to try our crop prediction endpoint directly."
+                elif "crop" in msg_lower or "plant" in msg_lower:
+                    reply += " For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations."
+                elif "disease" in msg_lower or "spot" in msg_lower or "sick" in msg_lower:
+                    reply += " For plant disease detection, please upload a photo of the affected plant through our disease detection endpoint for accurate diagnosis."
+                else:
+                    reply += " Please try again later when our AI service is available again."
+
+            except Exception as e:
+                logger.error(f"Unexpected error during OpenRouter API call: {e}", exc_info=True)
+                reply = "I apologize, but something went wrong processing your request."
+
+            intent = "llama_fallback"
 
         # Save bot reply to Redis
         try:
@@ -212,3 +285,13 @@ You are designed to **assist, educate, and empower farmers** using science, data
     except Exception as e:
         logger.error(f"Chatbot error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Chatbot error occurred")
+
+@router.get("/test-env")
+async def test_environment():
+    logger.debug("Testing environment variables...")
+    return {
+        "api_key_present": bool(OPENROUTER_API_KEY),
+        "api_key_length": len(OPENROUTER_API_KEY) if OPENROUTER_API_KEY else 0,
+        "api_key_prefix": OPENROUTER_API_KEY[:10] + "..." if OPENROUTER_API_KEY else None,
+        "environment": os.environ.get("ENV", "development")
+    }

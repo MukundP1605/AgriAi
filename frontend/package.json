@@ -8,19 +8,36 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:css": "tailwindcss -i ./input.css -o ./output.css"
+    "build:css": "tailwindcss -i ./input.css -o ./output.css",
+    "build:css:classic": "tailwindcss -i ./src/themes/classic/input.css -o ./src/themes/classic/output.css --config ./tailwind.classic.config.js",
+    "build:css:futuristic": "tailwindcss -i ./src/themes/futuristic/input.css -o ./src/themes/futuristic/output.css --config ./tailwind.futuristic.config.js",
+    "build:css:all": "npm run build:css:classic && npm run build:css:futuristic",
+    "build:themes": "node build-themes.js",
+    "dev:with-themes": "npm run build:css:all && npm run dev",
+    "watch:themes": "node watch-themes.js",
+    "dev:full": "node dev-with-themes.js",
+    "theme:toggle": "node toggle-theme.js",
+    "theme:classic": "node toggle-theme.js classic",
+    "theme:futuristic": "node toggle-theme.js futuristic",
+    "test:theme-separation": "node theme-separation-test.js",
+    "debug:theme": "node debug-theme.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@react-three/drei": "^10.1.2",
+    "@react-three/fiber": "^9.1.2",
     "axios": "^1.9.0",
     "browser-image-compression": "^2.0.2",
+    "framer-motion": "^12.15.0",
     "lucide-react": "^0.511.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-grid-layout": "^1.5.1",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.6.0",
-    "recharts": "^2.15.3"
+    "recharts": "^2.15.3",
+    "three": "^0.177.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

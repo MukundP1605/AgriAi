@@ -1,0 +1,182 @@
+/* Light mode only styles for AgriAI */
+
+/* Base light theme colors */
+:root {
+  /* Light mode colors */
+  --bg-light: #ffffff;
+  --text-light: #1f2937;
+  --primary-green: #10b981;  /* emerald-500 */
+  --primary-emerald: #059669; /* emerald-600 */
+  --light-bg: #f8fafc;
+  --light-text: #1f2937;
+  --light-border: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-bg-light: #f8fafc;
+}
+
+body, html, #root {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* --- LIGHT MODE: Clean light theme --- */
+body, html, #root {
+  background: #f8fafc;
+  color: #1f2937;
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.navbar, .navbar * {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #059669 100%);
+  color: #fff;
+}
+
+/* Hero section specific overrides */
+section .text-green-300 {
+  color: #86efac !important;
+}
+
+section .text-white {
+  color: #ffffff !important;
+}
+
+/* Enhanced Hero Section Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.6s;
+  opacity: 0;
+}
+
+/* Background Grid Pattern */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.card, .feature-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  color: #1f2937;
+  border: 1px solid #e2e8f0;
+}
+
+.button, .btn, button {
+  background: #059669 !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 4px 12px 0 rgba(5,150,105,0.15) !important;
+  transition: background 0.2s, color 0.2s;
+}
+
+.button:hover, .btn:hover, button:hover {
+  background: #047857 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px 0 rgba(5,150,105,0.25) !important;
+}
+
+input, textarea, select {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.1) !important;
+}
+
+.footer {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+/* Light theme text colors - removed !important to allow Tailwind overrides */
+h1, h2, h3, h4, h5, h6 {
+  color: #1f2937;
+}
+
+p, span, div {
+  color: #374151;
+}
+
+/* For smooth theme transitions */
+.theme-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth theme transition */
+.theme-transition,
+.theme-transition *,
+.theme-transition *:before,
+.theme-transition *:after {
+  transition: all 0.3s ease-in-out !important;
+  transition-delay: 0 !important;
+}
+
+/* Ensure light backgrounds can be overridden by Tailwind */
+.bg-white {
+  background: #ffffff;
+}
+
+.bg-gray-50 {
+  background: #f9fafb;
+}
+
+.bg-gray-100 {
+  background: #f3f4f6;
+}
+
+/* Tailwind color overrides - removed !important to allow proper Tailwind usage */
+.text-gray-900 {
+  color: #111827;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}

@@ -2,11 +2,13 @@ import sys
 import os
 import logging
 from dotenv import load_dotenv
+from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-load_dotenv()
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 from app.routes import crop
@@ -20,6 +22,15 @@ from app.database import Base, engine, get_db, SessionLocal
 from sqlalchemy.orm import Session
 from app.utils.redis_client import redis_client
 
+# Load environment variables at startup
+load_dotenv()
+
+# Verify required environment variables
+required_vars = ["OPENROUTER_API_KEY", "SECRET_KEY"]
+for var in required_vars:
+    if not os.getenv(var):
+        raise ValueError(f"{var} is missing in .env file")
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -27,6 +38,8 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY:
     logger.error("OPENROUTER_API_KEY is missing in .env file")
     raise ValueError("OPENROUTER_API_KEY is missing in .env file")
+else:
+    logger.info("✅ OpenRouter API key loaded successfully")
 
 try:
     logger.info("Ensuring database tables exist...")
@@ -61,7 +74,7 @@ app.include_router(profile_router, prefix="/api/user/profile", tags=["User Profi
 @app.on_event("startup")
 async def startup_event():
     try:
-        await redis_client.ping()
+        redis_client.ping()  # Changed from await since Redis client is synchronous
         logger.info("✅ Redis connected successfully!")
     except Exception as e:
         logger.error(f"⚠️ Redis connection failed at startup: {e}")

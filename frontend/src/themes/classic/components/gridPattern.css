@@ -1,0 +1,7 @@
+/* Grid pattern background */
+.bg-grid-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M0 0h1v20H0z M5 0h1v20H5z M10 0h1v20h-1z M15 0h1v20h-1z M0 0v1h20V0z M0 5v1h20V5z M0 10v1h20v-1z M0 15v1h20v-1z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Light mode styles */
+/* ...existing light mode styles... */

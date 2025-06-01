@@ -1,0 +1,346 @@
+/* Modern Chat Interface - Matching the AgriAI design from photo */
+
+/* Reset any external styles that might interfere */
+.modern-chat-container,
+.modern-chat-container * {
+  box-sizing: border-box;
+}
+
+.modern-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #111827 !important;
+  color: #f9fafb !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Chat Messages Area */
+.chat-messages-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #111827 !important;
+}
+
+/* Welcome Section */
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.quick-prompt-bubble {
+  background: #374151;
+  color: #e5e7eb;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #4b5563;
+}
+
+.quick-prompt-bubble:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+  transform: translateY(-1px);
+}
+
+/* Messages List */
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Message Containers */
+.message-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 70%;
+}
+
+.message-container.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-container.bot {
+  align-self: flex-start;
+}
+
+/* Avatars */
+.bot-avatar,
+.user-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.bot-avatar {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.avatar-icon {
+  font-size: 16px;
+}
+
+/* Message Bubbles */
+.message-bubble {
+  border-radius: 18px;
+  padding: 0.75rem 1rem;
+  max-width: 100%;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.message-bubble.bot {
+  background: #374151 !important;
+  color: #f9fafb !important;
+  border-bottom-left-radius: 6px;
+}
+
+.message-bubble.user {
+  background: #10b981 !important;
+  color: white !important;
+  border-bottom-right-radius: 6px;
+}
+
+.message-text {
+  line-height: 1.5;
+  font-size: 15px;
+  color: inherit !important;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9ca3af;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Input Area */
+.chat-input-area {
+  border-top: 1px solid #374151;
+  background: #1f2937;
+  padding: 1rem;
+}
+
+.input-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.input-form {
+  width: 100%;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  background: #374151;
+  border-radius: 24px;
+  padding: 8px;
+  border: 1px solid #4b5563;
+  transition: border-color 0.2s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: #10b981;
+}
+
+.message-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  color: #f9fafb;
+  font-size: 15px;
+  resize: none;
+  min-height: 20px;
+  max-height: 120px;
+  line-height: 1.4;
+}
+
+.message-input::placeholder {
+  color: #9ca3af;
+}
+
+.message-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.send-button {
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.send-button:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar Styling */
+.messages-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-list::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+
+.messages-list::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .messages-list {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .message-container {
+    max-width: 85%;
+  }
+  
+  .chat-input-area {
+    padding: 0.75rem;
+  }
+  
+  .input-wrapper {
+    padding: 6px;
+  }
+  
+  .message-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .send-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Animation for messages appearing */
+.message-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Force visibility and override any external styles */
+.modern-chat-container .message-text,
+.modern-chat-container .message-bubble,
+.modern-chat-container .quick-prompt-bubble {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.modern-chat-container .message-bubble.bot .message-text {
+  color: #f9fafb !important;
+}
+
+.modern-chat-container .message-bubble.user .message-text {
+  color: white !important;
+}
+
+.modern-chat-container .quick-prompt-bubble {
+  color: #e5e7eb !important;
+}
