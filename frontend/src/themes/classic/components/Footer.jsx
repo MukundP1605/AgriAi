@@ -7,6 +7,8 @@ import {
   Brain,
   Bot,
   ShieldCheck,
+  ShoppingCart,
+  TestTube,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -55,13 +57,28 @@ const Footer = () => {  return (
               >
                 <ShieldCheck className="w-4 h-4" /> Disease Detection
               </Link>
-            </li>
-            <li>
+            </li>            <li>
               <Link
                 to="/chat"
                 className="text-gray-300 dark:text-gray-200 hover:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
               >
                 <Bot className="w-4 h-4" /> AI Assistant
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/fertilizer"
+                className="text-gray-300 dark:text-gray-200 hover:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
+              >
+                <TestTube className="w-4 h-4" /> Fertilizer Advisor
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/marketplace"
+                className="text-gray-300 dark:text-gray-200 hover:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
+              >
+                <ShoppingCart className="w-4 h-4" /> Marketplace
               </Link>
             </li>
           </ul>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test</title>
+</head>
+<body>
+    <h1>Frontend Authentication Test</h1>
+    <div>
+        <h2>Login Test</h2>
+        <button id="testLogin">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>Fertilizer API Test (requires login)</h2>
+        <button id="testFertilizerWithAuth">Test Fertilizer API</button>
+        <div id="fertilizerResult"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'demo@agriai.com',
+                        password: 'demo123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    resultDiv.innerHTML = `<h3>✅ Login Successful!</h3><p>Token: ${authToken.substring(0, 20)}...</p>`;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<h3>❌ Login Failed</h3><p>Status: ${response.status}</p><p>Error: ${errorText}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<h3>❌ Network Error</h3><p>${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('testFertilizerWithAuth').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('fertilizerResult');
+            
+            if (!authToken) {
+                resultDiv.innerHTML = '<h3>❌ Please login first!</h3>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Testing fertilizer API...';
+            
+            try {
+                const testData = {
+                    nitrogen: 45.0,
+                    phosphorus: 25.0,
+                    potassium: 35.0,
+                    ph: 6.5,
+                    moisture: 65.0,
+                    organic_matter: 3.5,
+                    location: "Test Farm, Test State",
+                    crop_type: "wheat",
+                    area_size: 2.5,
+                    organic_preference: "chemical"
+                };
+                
+                const response = await fetch('/api/fertilizer/fertilizer-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <h3>✅ Fertilizer Analysis Successful!</h3>
+                        <p>Confidence: ${data.confidence_score}%</p>
+                        <p>NPK Analysis: ${JSON.stringify(data.npk_analysis || {}, null, 2)}</p>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<h3>❌ Fertilizer API Failed</h3><p>Status: ${response.status}</p><p>Error: ${errorText}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<h3>❌ Network Error</h3><p>${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

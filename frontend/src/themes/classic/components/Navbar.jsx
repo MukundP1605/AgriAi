@@ -11,34 +11,73 @@ const Navbar = () => {
   // Defensive destructuring with default values
   const { isAuthenticated, currentUser, logout } = auth || {};
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isAIMenuOpen, setIsAIMenuOpen] = useState(false);
   
-  // Ref for the dropdown container to handle hover interactions
+  // Refs for the dropdown containers to handle hover interactions
   const dropdownRef = useRef(null);
-  
-  // Effect to handle hover on dropdown
+  const aiDropdownRef = useRef(null);  
+  // Effect to handle hover on dropdowns  useEffect(() => {
+  // Effect to handle hover on dropdowns
   useEffect(() => {
     const dropdownElement = dropdownRef.current;
     
-    if (!dropdownElement) return;
-    
-    const handleMouseEnter = () => setIsUserMenuOpen(true);
-    const handleMouseLeave = () => setIsUserMenuOpen(false);
-    
-    dropdownElement.addEventListener('mouseenter', handleMouseEnter);
-    dropdownElement.addEventListener('mouseleave', handleMouseLeave);
-    
-    return () => {
-      dropdownElement.removeEventListener('mouseenter', handleMouseEnter);
-      dropdownElement.removeEventListener('mouseleave', handleMouseLeave);
-    };
+    if (dropdownElement) {
+      const handleMouseEnter = () => setIsUserMenuOpen(true);
+      const handleMouseLeave = () => setIsUserMenuOpen(false);
+      
+      dropdownElement.addEventListener('mouseenter', handleMouseEnter);
+      dropdownElement.addEventListener('mouseleave', handleMouseLeave);
+      
+      return () => {
+        dropdownElement.removeEventListener('mouseenter', handleMouseEnter);
+        dropdownElement.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    }
   }, []);
-    const navItems = [
+  useEffect(() => {
+    const aiDropdownElement = aiDropdownRef.current;
+    
+    if (aiDropdownElement) {
+      const handleMouseEnter = () => setIsAIMenuOpen(true);
+      const handleMouseLeave = () => setIsAIMenuOpen(false);
+      
+      aiDropdownElement.addEventListener('mouseenter', handleMouseEnter);
+      aiDropdownElement.addEventListener('mouseleave', handleMouseLeave);
+      
+      return () => {
+        aiDropdownElement.removeEventListener('mouseenter', handleMouseEnter);
+        aiDropdownElement.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    }
+  }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (aiDropdownRef.current && !aiDropdownRef.current.contains(event.target)) {
+        setIsAIMenuOpen(false);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  // Navigation items - reorganized with AI Tools dropdown
+  const navItems = [
     { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/crop', label: 'Crop Planner', icon: '🌾' },
-    { path: '/disease', label: 'Disease Detection', icon: '🔍' },
-    { path: '/chat', label: 'AI Assistant', icon: '💬' },
     { path: '/marketplace', label: 'Marketplace', icon: '🛒' },
+    { path: '/chat', label: 'AI Chat', icon: '💬' },
     { path: '/about', label: 'About', icon: 'ℹ️' }
+  ];
+
+  // AI Tools dropdown items (only crop, disease, fertilizer)
+  const aiToolsItems = [
+    { path: '/crop', label: 'Crop Planner', icon: '🌾', description: 'Get AI-powered crop recommendations' },
+    { path: '/disease', label: 'Disease Detection', icon: '🔍', description: 'Identify plant diseases from photos' },
+    { path: '/fertilizer', label: 'Fertilizer Guide', icon: '🧪', description: 'Smart fertilizer recommendations' }
   ];
 
   // Authentication links are handled separately for better styling
@@ -66,10 +105,9 @@ const Navbar = () => {
             <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               AgriAI
             </span>
-          </Link>
-
-          {/* Navigation Links - Centered */}
-          <div className="hidden md:flex items-center space-x-1">            {navItems.map((item) => (
+          </Link>          {/* Navigation Links - Centered */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -82,7 +120,52 @@ const Navbar = () => {
                 <span className="text-sm">{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
-            ))}{/* User Profile */}
+            ))}            {/* AI Tools Dropdown */}
+            <div className="relative" ref={aiDropdownRef}>
+              <div 
+                className={`flex items-center space-x-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  ['/crop', '/disease', '/fertilizer'].includes(location.pathname)
+                    ? 'bg-green-500 text-white'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+                onClick={() => setIsAIMenuOpen(!isAIMenuOpen)}
+              >
+                <span className="text-sm">🤖</span>
+                <span>AI Tools</span>
+                <svg className="w-4 h-4 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              {/* AI Tools dropdown menu */}
+              {isAIMenuOpen && (
+                <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl py-2 z-10 border border-gray-100">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-800 flex items-center">
+                      <span className="mr-2">🤖</span>
+                      AI-Powered Tools
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Smart farming solutions at your fingertips</p>
+                  </div>
+                  
+                  {aiToolsItems.map((tool) => (
+                    <Link 
+                      key={tool.path}
+                      to={tool.path} 
+                      className={`flex items-start px-4 py-3 hover:bg-gray-50 transition-colors ${
+                        location.pathname === tool.path ? 'bg-green-50 border-r-2 border-green-500' : ''
+                      }`}
+                    >
+                      <span className="mr-3 text-lg">{tool.icon}</span>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{tool.label}</div>
+                        <div className="text-xs text-gray-500 mt-1">{tool.description}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>{/* User Profile */}
             <div className="flex items-center ml-4">
               {isAuthenticated && currentUser ? (
                 <div className="relative" ref={dropdownRef}>

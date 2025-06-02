@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Fertilizer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 15px; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Complete Fertilizer System Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Authentication</h2>
+        <button id="testLogin">Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Fertilizer Analysis</h2>
+        <button id="testAnalysis" disabled>Run Analysis</button>
+        <div id="analysisResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: PDF Download</h2>
+        <button id="testPDF" disabled>Download PDF Report</button>
+        <div id="pdfResult"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let analysisData = null;
+        
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '🔄 Logging in...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'demo@agriai.com',
+                        password: 'demo123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    resultDiv.innerHTML = `<div class="success">✅ Login successful!</div>`;
+                    document.getElementById('testAnalysis').disabled = false;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${errorText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Login error: ${error.message}</div>`;
+            }
+        });
+        
+        document.getElementById('testAnalysis').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.innerHTML = '🔄 Running fertilizer analysis...';
+            
+            try {
+                const soilData = {
+                    nitrogen: 34,
+                    phosphorus: 54,
+                    potassium: 78,
+                    ph: 8,
+                    moisture: 89,
+                    organic_matter: 3.5,
+                    location: "Test Farm, Test State",
+                    crop_type: "wheat",
+                    area_size: 2.5,
+                    organic_preference: "chemical"
+                };
+                
+                const response = await fetch('/api/fertilizer/fertilizer-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(soilData)
+                });
+                
+                if (response.ok) {
+                    analysisData = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Analysis successful!</div>
+                        <p><strong>Confidence:</strong> ${analysisData.confidence_score}%</p>
+                        <p><strong>Request ID:</strong> ${analysisData.request_id}</p>
+                        <p><strong>Current NPK:</strong> N=${analysisData.npk_analysis.current_npk.N}, P=${analysisData.npk_analysis.current_npk.P}, K=${analysisData.npk_analysis.current_npk.K}</p>
+                        <p><strong>Recommended NPK:</strong> N=${analysisData.npk_analysis.recommended_npk.N}, P=${analysisData.npk_analysis.recommended_npk.P}, K=${analysisData.npk_analysis.recommended_npk.K}</p>
+                    `;
+                    document.getElementById('testPDF').disabled = false;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Analysis failed: ${errorText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Analysis error: ${error.message}</div>`;
+            }
+        });
+        
+        document.getElementById('testPDF').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('pdfResult');
+            resultDiv.innerHTML = '🔄 Generating PDF report...';
+            
+            try {
+                // Test both proxy and direct backend approaches
+                const backendUrl = 'http://localhost:8000'; // Direct backend URL
+                
+                const response = await fetch(`${backendUrl}/api/fertilizer/download-report`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({})  // Empty body since backend fetches from database
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `fertilizer-report-${Date.now()}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ PDF download successful!</div>
+                        <p>File size: ${blob.size} bytes</p>
+                        <p>Content type: ${response.headers.get('content-type')}</p>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ PDF download failed: ${errorText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ PDF error: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

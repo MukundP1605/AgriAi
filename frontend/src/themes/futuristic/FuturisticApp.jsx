@@ -7,6 +7,11 @@ import DiseaseUpload from './pages/Disease';
 import Chat from './pages/Chat';
 import Home from './pages/Home';
 import Crop from './pages/Crop';
+import FuturisticFertilizer from './pages/FuturisticFertilizer';
+import FuturisticMarketplace from './pages/FuturisticMarketplace';
+import FuturisticCart from './pages/FuturisticCart';
+import FuturisticOrderHistory from './pages/FuturisticOrderHistory';
+import FuturisticOrderSuccess from './pages/FuturisticOrderSuccess';
 import About from './pages/About';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -16,7 +21,6 @@ import History from './pages/History';
 import TestEnhancedFeatures from './pages/TestEnhancedFeatures';
 import EnhancedDashboard from './pages/EnhancedDashboard';
 import ThemeDemo from './components/ThemeDemo';
-import ThemeSwitcher from './components/ThemeSwitcher';
 import { AuthProvider } from '../../context/AuthContext';
 import './styles/dashboard.css';
 
@@ -26,25 +30,30 @@ const AppLayout = () => {
   return (
     <div className="theme-futuristic min-h-screen w-full h-full bg-[#0a0a0f] text-white overflow-hidden">
       <Navbar />
-      <div className="relative h-screen w-full bg-transparent text-white">
-        <Routes>
+      <div className="relative h-screen w-full bg-transparent text-white">        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/crop" element={<Crop />} />
           <Route path="/disease" element={<DiseaseUpload />} />
+          <Route path="/fertilizer" element={<FuturisticFertilizer />} />
+          <Route path="/marketplace" element={<FuturisticMarketplace />} />
+          <Route path="/cart" element={<FuturisticCart />} />
+          <Route path="/order-history" element={<FuturisticOrderHistory />} />
+          <Route path="/order-success/:orderId" element={<FuturisticOrderSuccess />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/about" element={<About />} />
           <Route path="/forms" element={<AgriAIFormsPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/profile" element={<Profile />} />          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/history" element={<History />} />
           <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />
           <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />
           <Route path="/theme-demo" element={<ThemeDemo />} />
           <Route path="*" element={<Login />} />
-        </Routes>      </div>
+        </Routes>
+      </div>
       {!hideFooter && <Footer />}
-      <ThemeSwitcher />
     </div>
   );
 };

@@ -23,11 +23,9 @@ const About = () => {
                 Founded in 2023, we've been working closely with farmers, agricultural scientists, and AI experts to develop solutions that address real-world farming challenges. Our team combines decades of agricultural experience with cutting-edge technology to create tools that genuinely improve farming outcomes.
               </p>
             </div>
-          </section>
-
-          <section className="mb-16">
+          </section>          <section className="mb-16">
             <h2 className="text-2xl font-semibold text-center text-blue-700 dark:text-blue-300 mb-8">What Makes Us Unique?</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div className="bg-white/90 dark:bg-slate-900/90 p-8 rounded-3xl shadow-lg group hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-900 dark:hover:to-indigo-950 hover:shadow-blue-200 dark:hover:shadow-indigo-900 transition-all duration-300 flex flex-col items-center backdrop-blur-sm">
                 <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🌱</span>
                 <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-200 transition-colors">Smart Crop Planning</h3>
@@ -59,6 +57,31 @@ const About = () => {
                   <li>Contextual understanding</li>
                   <li>Multilingual support</li>
                   <li>Continuous learning system</li>
+                </ul>
+              </div>
+            </div>
+            {/* Second row of features */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="bg-white/90 dark:bg-slate-900/90 p-8 rounded-3xl shadow-lg group hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-900 dark:hover:to-indigo-950 hover:shadow-blue-200 dark:hover:shadow-indigo-900 transition-all duration-300 flex flex-col items-center backdrop-blur-sm">
+                <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🧪</span>
+                <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-200 transition-colors">Fertilizer Advisor</h3>
+                <p className="text-slate-700 dark:text-slate-300 text-center mb-3">Smart fertilizer recommendations based on soil analysis and crop requirements.</p>
+                <ul className="text-slate-600 dark:text-slate-400 text-sm list-disc pl-5 mt-2 self-start">
+                  <li>Soil nutrient analysis</li>
+                  <li>Custom fertilizer blends</li>
+                  <li>Application timing optimization</li>
+                  <li>Environmental impact assessment</li>
+                </ul>
+              </div>
+              <div className="bg-white/90 dark:bg-slate-900/90 p-8 rounded-3xl shadow-lg group hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-900 dark:hover:to-indigo-950 hover:shadow-blue-200 dark:hover:shadow-indigo-900 transition-all duration-300 flex flex-col items-center backdrop-blur-sm">
+                <span className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🛒</span>
+                <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-200 transition-colors">Marketplace</h3>
+                <p className="text-slate-700 dark:text-slate-300 text-center mb-3">Shop for premium agricultural products, tools, and equipment with AI-powered recommendations.</p>
+                <ul className="text-slate-600 dark:text-slate-400 text-sm list-disc pl-5 mt-2 self-start">
+                  <li>Curated product selection</li>
+                  <li>Competitive pricing</li>
+                  <li>Expert reviews and ratings</li>
+                  <li>Fast shipping and support</li>
                 </ul>
               </div>
             </div>

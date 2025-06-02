@@ -29,42 +29,41 @@ const AppLayout = () => {
       <Navbar />
       
       {/* Hero Section - only show on routes that aren't chat, crop, or disease */}
-      {!hideHeroSection && (
-        <section className="bg-gradient-radial from-green-400 via-green-500 to-green-600 text-white py-16" style={{background: 'radial-gradient(ellipse at center, #16a34a 0%, #15803d 70%, #14532d 100%)'}}>
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-5xl font-bold mb-6">
-              <span className="text-white">Agri</span><span className="text-green-300">AI</span>
-            </h1>
-            <p className="text-lg mb-8 text-white max-w-2xl mx-auto">
-              Your intelligent farming companion powered by AI. Get crop recommendations, disease 
-              detection, and expert agricultural advice.
-            </p>
-            
-            {/* Feature Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center mb-8">
-              <a href="/crop" className="bg-green-700 text-white px-6 py-3 rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center gap-2 border border-white/30">
-                <span>🌱</span> Smart Crop Planning
-              </a>
-              <a href="/disease" className="bg-green-700 text-white px-6 py-3 rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center gap-2 border border-white/30">
-                <span>🔬</span> Disease Detection
-              </a>
-              <a href="/chat" className="bg-green-700 text-white px-6 py-3 rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center gap-2 border border-white/30">
-                <span>🤖</span> AI Assistant
-              </a>
-            </div>
-            
-            {/* CTA Buttons */}
-            <div className="flex gap-4 justify-center">
-              <a href="/signup" className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
-                Sign Up
-              </a>
-              <a href="/about" className="border border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors duration-200">
-                Learn More
-              </a>
-            </div>
-          </div>
-        </section>
-      )}
+{!hideHeroSection && (
+  <section
+    className="bg-gradient-radial from-green-400 via-green-500 to-green-600 text-white py-16"
+    style={{
+      background: 'radial-gradient(ellipse at center, #16a34a 0%, #15803d 70%, #14532d 100%)',
+    }}
+  >
+    <div className="max-w-4xl mx-auto px-4 text-center">
+      <h1 className="text-5xl font-bold mb-6">
+        <span className="text-white">Agri</span>
+        <span className="text-green-300">AI</span>
+      </h1>
+      <p className="text-lg mb-8 text-white max-w-2xl mx-auto">
+        Welcome to AgriAI — your smart agriculture partner. Our advanced AI technology helps farmers
+        make better decisions, boost productivity, and protect crops with timely insights and expert guidance.
+      </p>
+
+      {/* CTA Buttons */}
+      <div className="flex gap-4 justify-center">
+        <a
+          href="/signup"
+          className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+        >
+          Sign Up
+        </a>
+        <a
+          href="/about"
+          className="border border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors duration-200"
+        >
+          Learn More
+        </a>
+      </div>
+    </div>
+  </section>
+)}
 
       {/* Main Content */}
       <div className={`relative ${hideHeroSection ? 'h-[calc(100vh-4rem)]' : ''} bg-white text-gray-900`}>

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 
 const Home = () => {
-
   const features = [
     {
       icon: '🌾',
@@ -25,20 +24,24 @@ const Home = () => {
       description: 'Chat with our agricultural AI expert for personalized farming advice and tips.',
       path: '/chat',
       gradient: 'from-purple-500 to-pink-600'
-    },
-    {
+    },    {
+      icon: '🧪',
+      title: 'Fertilizer Advisor',
+      description: 'Get smart fertilizer recommendations based on soil analysis and crop requirements.',
+      path: '/fertilizer',
+      gradient: 'from-lime-500 to-green-600'
+    },    {
       icon: '🛒',
       title: 'Marketplace',
       description: 'Shop for premium agricultural products, tools, and equipment for your farming needs.',
       path: '/marketplace',
-      gradient: 'from-amber-500 to-orange-600'
-    },
-    {
+      gradient: 'from-orange-500 to-red-600'
+    },    {
       icon: '📊',
       title: 'Farm Analytics',
       description: 'Track your farming progress and get insights to optimize your agricultural practices.',
       path: '/forms',
-      gradient: 'from-orange-500 to-red-600'
+      gradient: 'from-blue-500 to-indigo-700'
     }
   ];return (
     <>
@@ -54,7 +57,7 @@ const Home = () => {
               <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
               Now powered by advanced AI models
             </div>
-          </div>          {/* Features Grid - Optimized 3-2 Layout */}
+          </div>          {/* Features Grid - Optimized 3-3 Layout */}
           <div className="mb-20">
             {/* Top row - 3 cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -95,9 +98,9 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Bottom row - 2 cards centered */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {features.slice(3, 5).map((feature, index) => (
+            {/* Bottom row - 3 cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {features.slice(3, 6).map((feature, index) => (
                 <Link
                   key={index + 3}
                   to={feature.path}
@@ -127,9 +130,25 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Floating visual effects */}
-                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-emerald-200 to-green-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
-                  <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-200 to-cyan-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                  {/* Floating visual effects - unique for each card */}
+                  {index === 0 && (
+                    <>
+                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-lime-200 to-green-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                      <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-green-200 to-lime-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                    </>
+                  )}
+                  {index === 1 && (
+                    <>
+                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-orange-200 to-red-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                      <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-red-200 to-orange-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                    </>
+                  )}
+                  {index === 2 && (
+                    <>
+                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-200 to-indigo-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                      <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-indigo-200 to-blue-300 rounded-full opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+                    </>
+                  )}
                 </Link>
               ))}
             </div>
