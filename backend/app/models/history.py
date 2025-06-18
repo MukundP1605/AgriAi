@@ -28,17 +28,29 @@ class UserCropHistory(Base):
     user_id = Column(Integer, index=True)
     recommended_crop = Column(String(100), nullable=False)
     location = Column(String(255), nullable=False)
-    soil_nutrients = Column(JSON, nullable=False)  # N, P, K, pH
-    climate_data = Column(JSON, nullable=False)  # temperature, humidity, rainfall
+    soil_nutrients = Column(JSON, nullable=True)  # N, P, K, pH, etc.
+    climate_data = Column(JSON, nullable=True)  # temperature, humidity, rainfall
     season = Column(String(50), nullable=True)
     confidence_score = Column(Float, nullable=True)
-    alternative_crops = Column(JSON, nullable=True)  # list of other suitable crops
-    expected_yield = Column(String(100), nullable=True)
-    estimated_profit = Column(Float, nullable=True)
-    implementation_status = Column(String(50), default="planned")  # planned, implemented, completed
+    alternative_crops = Column(JSON, nullable=True)  # list of alternative crops
+    implementation_status = Column(String(50), default="pending")  # pending, in_progress, successful, failed
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_archived = Column(Boolean, default=False)
+    
+class ChatLog(Base):
+    """Chat history log for user interactions"""
+    __tablename__ = "chat_logs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(100), index=True)
+    user_message = Column(Text, nullable=False)
+    bot_response = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    intent = Column(String(100), nullable=True)
+    
+    def __repr__(self):
+        return f"<ChatLog(id={self.id}, session_id={self.session_id})>"
 
 class UserChatHistory(Base):
     """Chat conversation history table"""

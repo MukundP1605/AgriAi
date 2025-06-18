@@ -16,6 +16,7 @@ import Settings from './pages/Settings';
 import History from './pages/History';
 import TestEnhancedFeatures from './pages/TestEnhancedFeatures';
 import EnhancedDashboard from './pages/EnhancedDashboard';
+import CropManagementDashboard from './components/CropManagement/CropManagementDashboard';
 import ClassicThemeDemo from './components/ClassicThemeDemo';
 import Marketplace from './pages/Marketplace';
 import Cart from './pages/Cart';
@@ -27,7 +28,7 @@ import './components/darkModeAnimations.css';
 
 const AppLayout = () => {
   const location = useLocation();  
-  const hideHeroSection = ['/chat', '/crop', '/disease', '/fertilizer', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup', '/marketplace', '/cart', '/order-history', '/order-success'].includes(location.pathname) || location.pathname.startsWith('/order-success/');  
+  const hideHeroSection = ['/chat', '/crop', '/disease', '/fertilizer', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup', '/marketplace', '/cart', '/order-history', '/order-success', '/crop-session'].includes(location.pathname) || location.pathname.startsWith('/order-success/') || location.pathname.startsWith('/crop-session/');  
   // Show footer on all pages
   const hideFooter = [];
   
@@ -99,10 +100,7 @@ const AppLayout = () => {
       </div>
     </div>
   </section>
-)}
-
-
-      <div className={`relative flex-grow ${hideHeroSection ? 'min-h-0' : ''} bg-white text-gray-900`}>        <Routes>
+)}      <div className={`relative flex-grow ${hideHeroSection ? 'min-h-0' : ''} bg-white text-gray-900`}>        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/crop" element={<Crop />} />
           <Route path="/disease" element={<DiseaseUpload />} />
@@ -115,14 +113,14 @@ const AppLayout = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />          
           <Route path="/history" element={<History />} />
-          <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />
-          <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />
+          <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />          <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />          <Route path="/crop-management" element={<CropManagementDashboard />} />
+          <Route path="/crop-management/session/:sessionId" element={<CropManagementDashboard />} />
+  
           <Route path="/theme-demo" element={<ClassicThemeDemo />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/marketplace" element={<Marketplace />} />          <Route path="/cart" element={<Cart />} />
           <Route path="/order-success/:orderId" element={<OrderSuccess />} />
           <Route path="/order-history" element={<OrderHistory />} />
-          <Route path="*" element={<Login />} />        </Routes>
+          <Route path="*" element={<Login />} /></Routes>
       </div>
       {!hideFooter && <Footer />}
       </div>
@@ -133,9 +131,9 @@ const AppLayout = () => {
 export default function ClassicApp() {
   return (
     <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
+        <Router>
+          <AppLayout />
+        </Router>
     </AuthProvider>
   );
 }

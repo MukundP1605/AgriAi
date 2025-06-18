@@ -27,6 +27,9 @@ export default {
           emerald: '#10b981',
         },
       },
+      fontFamily: {
+        'sora': ['Sora', 'sans-serif'],
+      },
       boxShadow: {
         'glass': '0 8px 32px 0 rgba(139,92,246,0.12), 0 1.5px 8px 0 rgba(16,185,129,0.10)',
         'neon': '0 0 24px 0 rgba(139,92,246,0.18), 0 0 8px 0 rgba(16,185,129,0.10)',
@@ -34,11 +37,12 @@ export default {
       backgroundImage: {
         'hero-dark': 'radial-gradient(ellipse at top, #8b5cf6 0%, #121212 80%)',
         'aurora': 'radial-gradient(circle at 50% 0, rgba(236,72,153,0.18) 0%, transparent 80%)',
-      },
-      animation: {
-        'spin-slow': 'spin 3s linear infinite',
+      },      animation: {
+        'spin-slow': 'spin 8s linear infinite',
         'float': 'float 6s ease-in-out infinite',
         'pulse-subtle': 'pulse-subtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'scan-line': 'scan-line 3s linear infinite',
+        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
       },
       keyframes: {
         float: {
@@ -48,6 +52,13 @@ export default {
         'pulse-subtle': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' },
+        },        'scan-line': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
         },
       },
     },

@@ -20,6 +20,7 @@ from app.routes.user_history import router as history_router
 from app.routes.user_profile import router as profile_router
 from app.routes.marketplace import router as marketplace_router
 from app.routes.fertilizer import router as fertilizer_router
+from app.routes.crop_management import router as crop_management_router
 from app.database import Base, engine, get_db, SessionLocal
 from sqlalchemy.orm import Session
 from app.utils.redis_client import redis_client
@@ -59,7 +60,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # frontend origin
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000", 
+                  "http://localhost:5174", "http://localhost:5175", "http://127.0.0.1:5174", "http://127.0.0.1:5175",
+                  "http://localhost:*", "http://127.0.0.1:*"],  # frontend origins with wildcard for dev ports
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +77,7 @@ app.include_router(history_router, prefix="/api/user/history", tags=["User Histo
 app.include_router(profile_router, prefix="/api/user/profile", tags=["User Profile"])
 app.include_router(marketplace_router, prefix="/api/marketplace", tags=["Marketplace"])
 app.include_router(fertilizer_router, prefix="/api/fertilizer", tags=["Fertilizer Recommendation"])
+app.include_router(crop_management_router, prefix="/api/crop-management", tags=["Crop Management"])
 
 @app.on_event("startup")
 async def startup_event():

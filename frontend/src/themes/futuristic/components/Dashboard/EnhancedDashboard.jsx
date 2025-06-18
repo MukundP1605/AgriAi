@@ -8,6 +8,7 @@ const EnhancedDashboard = () => {
   const { currentUser, getToken } = useAuth(); // <-- FIXED: get getToken here
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Add error state
   const [timeRange, setTimeRange] = useState('30'); // days
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -19,14 +20,16 @@ const EnhancedDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
       const token = getToken(); // <-- FIXED: just call it here
 
       if (!token) {
         console.error('No authentication token found');
+        setError('Authentication error. Please try logging in again.');
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/api/user/history/dashboard?days=${timeRange}`, {
+      const response = await fetch(`/api/user/history/dashboard?days=${timeRange}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -34,6 +37,16 @@ const EnhancedDashboard = () => {
       });      if (!response.ok) {
         const errorText = await response.text();
         console.error('Dashboard API error:', response.status, errorText);
+        
+        // Set a user-friendly error message based on status code
+        if (response.status === 404) {
+          setError('Dashboard data is not available. The service might be under maintenance.');
+        } else if (response.status === 401 || response.status === 403) {
+          setError('You are not authorized to view this dashboard. Please log in again.');
+        } else {
+          setError(`Error loading dashboard: ${response.status}. Please try again later.`);
+        }
+        
         throw new Error(`Failed to fetch dashboard data: ${errorText}`);
       }
 
@@ -62,10 +75,9 @@ const EnhancedDashboard = () => {
       };
 
       console.log('Processed dashboard data:', dashboardData);
-      setDashboardData(dashboardData);
-    } catch (error) {
+      setDashboardData(dashboardData);    } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // You could add an error state here to show to the user
+      setError(error.message || 'Failed to load dashboard data. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -146,6 +158,34 @@ const EnhancedDashboard = () => {
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg p-6 h-32"></div>
               ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Add error state display
+  if (error) {
+    return (
+      <div className="min-h-screen py-8 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-red-900/50 border border-red-800 rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-red-400 mb-2">Dashboard Error</h2>
+            <p className="text-gray-300 mb-4">{error}</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => fetchDashboardData()}
+                className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md transition"
+              >
+                Retry
+              </button>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition"
+              >
+                Go to Home
+              </button>
             </div>
           </div>
         </div>
@@ -332,8 +372,7 @@ const EnhancedDashboard = () => {
                   <p className="text-sm text-gray-600 mb-4">
                     Average confidence in AI predictions
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
+                  <div className="w-full bg-gray-200 rounded-full h-2">                    <div
                       className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${dashboardData?.accuracy_rate || 0}%` }}
                     ></div>
@@ -358,8 +397,7 @@ const EnhancedDashboard = () => {
                     className="w-full"
                     onClick={async () => {
                       try {
-                        const token = localStorage.getItem('token');
-                        const response = await fetch('http://127.0.0.1:8000/api/user/history/export/all', {
+                        const token = localStorage.getItem('token');                        const response = await fetch('/api/user/history/export/all', {
                           headers: { 'Authorization': `Bearer ${token}` }
                         });
                         const data = await response.json();
@@ -382,8 +420,7 @@ const EnhancedDashboard = () => {
                     className="w-full"
                     onClick={async () => {
                       try {
-                        const token = localStorage.getItem('token');
-                        const response = await fetch('http://127.0.0.1:8000/api/user/history/export/scans', {
+                        const token = localStorage.getItem('token');                        const response = await fetch('/api/user/history/export/scans', {
                           headers: { 'Authorization': `Bearer ${token}` }
                         });
                         const data = await response.json();

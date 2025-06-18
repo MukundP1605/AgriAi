@@ -10,6 +10,7 @@ from deep_translator import GoogleTranslator  # Use deep-translator
 from langdetect import detect
 from app.utils.auth import get_current_active_user
 from app.models.users import DBUser
+from app.models.history import ChatLog
 
 # Configure logging for debug output
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s')
@@ -25,7 +26,7 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 from app.models.chatbot_llm import IntentRequest, IntentResponse, IntentClassifier
 from app.utils.redis_client import get_chat_history, append_to_history
 from app.database import get_db
-from app.chatlog import ChatLog
+#from app.chatlog import ChatLog
 
 router = APIRouter()
 intent_model = IntentClassifier()
@@ -293,16 +294,20 @@ You are designed to **assist, educate, and empower farmers** using science, data
         try:
             append_to_history(session_id, f"bot: {reply}")
         except redis.exceptions.ConnectionError:
-            pass
-
-        # Save chat log to DB
-        db_log = ChatLog(
-            session_id=session_id,
-            user_message=original_message,
-            bot_response=reply
-        )
-        db.add(db_log)
-        db.commit()
+            pass        # Save chat log to DB
+        try:
+            db_log = ChatLog(
+                session_id=session_id,
+                user_message=original_message,
+                bot_response=reply,
+                # The intent field might not be in the database schema
+                intent=intent
+            )
+            db.add(db_log)
+            db.commit()
+        except Exception as log_error:
+            logger.error(f"Failed to save chat log: {str(log_error)}")
+            db.rollback()  # Rollback the transaction in case of error
 
         return IntentResponse(reply=reply, intent=intent)
 

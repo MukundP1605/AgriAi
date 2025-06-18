@@ -72,12 +72,12 @@ const Navbar = () => {
     { path: '/chat', label: 'AI Chat', icon: '💬' },
     { path: '/about', label: 'About', icon: 'ℹ️' }
   ];
-
   // AI Tools dropdown items (only crop, disease, fertilizer)
   const aiToolsItems = [
     { path: '/crop', label: 'Crop Planner', icon: '🌾', description: 'Get AI-powered crop recommendations' },
     { path: '/disease', label: 'Disease Detection', icon: '🔍', description: 'Identify plant diseases from photos' },
-    { path: '/fertilizer', label: 'Fertilizer Guide', icon: '🧪', description: 'Smart fertilizer recommendations' }
+    { path: '/fertilizer', label: 'Fertilizer Guide', icon: '🧪', description: 'Smart fertilizer recommendations' },
+    
   ];
 
   // Authentication links are handled separately for better styling
@@ -219,14 +219,13 @@ const Navbar = () => {
                       >
                         <span className="mr-3">📈</span>
                         Advanced Dashboard
-                      </Link>
-                      <Link 
+                      </Link>                      <Link 
                         to="/settings" 
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <span className="mr-3">⚙️</span>
+                      >                        <span className="mr-3">⚙️</span>
                         Settings
-                      </Link>                      <div className="border-t border-gray-100 mt-2 pt-2">
+                      </Link>
+                      <div className="border-t border-gray-100 mt-2 pt-2">
                         <button 
                           onClick={handleLogout}
                           className="flex items-center w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"

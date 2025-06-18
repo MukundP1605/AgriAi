@@ -1,157 +1,134 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import EnhancedDashboard from '../components/Dashboard/EnhancedDashboard';
+import CropManagementDashboard from '../components/CropManagement/CropManagementDashboard';
+import FarmAnalytics from '../components/CropManagement/FarmAnalytics';
+import AlertManagement from '../components/Alerts/AlertManagement';
+import UserProfile from '../components/Profile/UserProfile';
+import Footer from '../components/Footer';
 
-const EnhancedDashboard = () => {
-  const auth = useAuth();
-  const { currentUser } = auth || {};
-  const [dashboardData, setDashboardData] = useState({
-    totalRecommendations: 0,
-    totalDetections: 0,
-    recentActivity: [],
-    popularCrops: [],
-    diseaseStats: []
-  });
-  const [loading, setLoading] = useState(true);
+const EnhancedDashboardPage = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-      
-      const response = await fetch('http://127.0.0.1:8000/api/user/history/dashboard?days=30', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Dashboard API error:', response.status, errorText);
-        throw new Error(`Failed to fetch dashboard data: ${errorText}`);
-      }
-        const data = await response.json();
-      
-      // Validate and transform the data to match our state structure
-      setDashboardData({
-        totalRecommendations: data.total_crop_plans || 0,
-        totalDetections: data.total_scans || 0,
-        recentActivity: data.recent_activity || [],
-        popularCrops: data.popular_crops || [],
-        diseaseStats: data.disease_stats || []
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+    if (!isAuthenticated) {
+      navigate('/login');
     }
-    setLoading(false);
-  };
+  }, [isAuthenticated, navigate]);
 
-  const exportData = async () => {
-    try {
-      const response = await fetch('/api/user/export', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `agriai_data_${currentUser?.email}_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-    } catch (error) {
-      console.error('Error exporting data:', error);
-    }
-  };
-
-  if (loading) return <div>Loading dashboard...</div>;
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
-    <div>
-      <h1>Enhanced Dashboard</h1>
-      
-      <div>
-        <h2>Overview</h2>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px'}}>
-          <div style={{border: '1px solid #ccc', padding: '10px'}}>
-            <h3>Crop Recommendations</h3>
-            <p style={{fontSize: '24px'}}>{dashboardData.totalRecommendations}</p>
-          </div>
-          <div style={{border: '1px solid #ccc', padding: '10px'}}>
-            <h3>Disease Detections</h3>
-            <p style={{fontSize: '24px'}}>{dashboardData.totalDetections}</p>
-          </div>
-          <div style={{border: '1px solid #ccc', padding: '10px'}}>
-            <h3>Total Sessions</h3>
-            <p style={{fontSize: '24px'}}>{dashboardData.recentActivity.length}</p>
+    <div className="flex-grow bg-black/90 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-8 mb-12">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Advanced AgriAI Dashboard
+            </span>
+          </h1>
+          <p className="text-gray-400">Comprehensive view of your agricultural activities and insights</p>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="mb-8 overflow-x-auto">
+          <div className="flex space-x-1 bg-gray-900/70 backdrop-blur-sm rounded-lg p-1 border border-gray-800 min-w-max">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'dashboard'
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+                  : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-800'
+              }`}
+            >
+              📊 Dashboard Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('crops')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'crops'
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+                  : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-800'
+              }`}
+            >
+              🌾 Crop Management
+            </button>
+            <button
+              onClick={() => setActiveTab('alerts')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'alerts'
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+                  : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-800'
+              }`}
+            >
+              🐛 Pest & Disease Alerts
+            </button>
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'profile'
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+                  : 'text-gray-400 hover:text-cyan-400 hover:bg-gray-800'
+              }`}
+            >
+              👤 User Profile
+            </button>
           </div>
         </div>
-      </div>
 
-      <div>
-        <h2>Recent Activity</h2>
-        {dashboardData.recentActivity.length === 0 ? (
-          <p>No recent activity</p>
-        ) : (
-          <div>
-            {dashboardData.recentActivity.slice(0, 5).map((activity, index) => (
-              <div key={index} style={{border: '1px solid #ccc', margin: '5px 0', padding: '10px'}}>
-                <strong>{activity.action}</strong> - {new Date(activity.timestamp).toLocaleString()}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Content Area */}
+        <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-cyan-500/30 p-6">
+          {activeTab === 'dashboard' && (
+            <div>
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6 flex items-center">
+                <span className="text-lg mr-2">📊</span>
+                Dashboard Analytics
+              </h2>
+              <EnhancedDashboard />
+            </div>
+          )}
+          
+          {activeTab === 'crops' && (
+            <div>
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6 flex items-center">
+                <span className="text-lg mr-2">🌾</span>
+                Crop Management
+              </h2>
+              <CropManagementDashboard />
+            </div>
+          )}
+          
+          {activeTab === 'alerts' && (
+            <div>
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6 flex items-center">
+                <span className="text-lg mr-2">🐛</span>
+                Pest & Disease Alert Management
+              </h2>
+              <AlertManagement />
+            </div>
+          )}
+          
+          {activeTab === 'profile' && (
+            <div>
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6 flex items-center">
+                <span className="text-lg mr-2">👤</span>
+                User Profile Management
+              </h2>
+              <UserProfile />
+            </div>
+          )}
+        </div>
       </div>
-
-      <div>
-        <h2>Popular Crops</h2>
-        {dashboardData.popularCrops.length === 0 ? (
-          <p>No crop data available</p>
-        ) : (
-          <ul>
-            {dashboardData.popularCrops.map((crop, index) => (
-              <li key={index}>{crop.name}: {crop.count} recommendations</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div>
-        <h2>Disease Statistics</h2>
-        {dashboardData.diseaseStats.length === 0 ? (
-          <p>No disease detection data</p>
-        ) : (
-          <ul>
-            {dashboardData.diseaseStats.map((disease, index) => (
-              <li key={index}>{disease.name}: {disease.count} detections</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div>
-        <h2>Actions</h2>
-        <button onClick={exportData}>Export My Data</button>
-        <button onClick={fetchDashboardData}>Refresh Dashboard</button>
-      </div>
-
-      <div>
-        <h2>Raw Data</h2>
-        <details>
-          <summary>View Raw Dashboard Data</summary>
-          <pre style={{fontSize: '12px'}}>{JSON.stringify(dashboardData, null, 2)}</pre>
-        </details>
-      </div>
+      
+      <Footer />
     </div>
   );
 };
 
-export default EnhancedDashboard;
+export default EnhancedDashboardPage;

@@ -9,6 +9,9 @@ from app.utils.auth import get_current_active_user
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -112,116 +115,172 @@ class EnhancedChatData(BaseModel):
     session_id: Optional[str] = None
 
 @router.get("/dashboard", response_model=DashboardStats)
-async def get_dashboard_stats(
+async def get_user_dashboard(
+    days: int = Query(30, description="Number of days to look back for statistics"),
     current_user: DBUser = Depends(get_current_active_user),
-    db: Session = Depends(get_db),
-    days: int = Query(30, description="Number of days to analyze")
+    db: Session = Depends(get_db)
 ):
-    """Get comprehensive dashboard statistics"""
-    
-    # Calculate date range
-    end_date = datetime.utcnow()
-    start_date = end_date - timedelta(days=days)
-    
-    # Get actual database counts
-    total_scans = db.query(UserScanHistory).filter(
-        UserScanHistory.user_id == current_user.id,
-        UserScanHistory.created_at >= start_date
-    ).count()
-    
-    total_crop_plans = db.query(UserCropHistory).filter(
-        UserCropHistory.user_id == current_user.id,
-        UserCropHistory.created_at >= start_date
-    ).count()
-    
-    # Count unique chat sessions
-    total_chat_sessions = db.query(UserChatHistory.session_id).filter(
-        UserChatHistory.user_id == current_user.id,
-        UserChatHistory.created_at >= start_date
-    ).distinct().count()
-    
-    # Calculate most common diseases
-    disease_counts = db.query(
-        UserScanHistory.disease_result,
-        func.count(UserScanHistory.disease_result).label('count')
-    ).filter(
-        UserScanHistory.user_id == current_user.id,
-        UserScanHistory.created_at >= start_date
-    ).group_by(UserScanHistory.disease_result).order_by(text('count DESC')).limit(5).all()
-    
-    total_disease_scans = sum([d.count for d in disease_counts])
-    most_common_diseases = [
-        {
-            "name": disease.disease_result,
-            "count": disease.count,
-            "percentage": round((disease.count / max(total_disease_scans, 1)) * 100, 1)
+    """
+    Get dashboard statistics for the authenticated user.
+    Provides key metrics like total scans, recommended crops, chat sessions,
+    and visualization data for the dashboard.
+    """
+    try:
+        # Calculate date range
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=days)
+        
+        # Get total scans
+        total_scans = db.query(func.count(UserScanHistory.id)).filter(
+            UserScanHistory.user_id == current_user.id,
+            UserScanHistory.created_at >= start_date
+        ).scalar() or 0
+          # Get total crop plans
+        total_crop_plans = db.query(func.count(UserCropHistory.id)).filter(
+            UserCropHistory.user_id == current_user.id,
+            UserCropHistory.created_at >= start_date if hasattr(UserCropHistory, 'created_at') else True
+        ).scalar() or 0
+        
+        # Get total chat sessions (unique session_ids)
+        total_chat_sessions = db.query(func.count(func.distinct(UserChatHistory.session_id))).filter(
+            UserChatHistory.user_id == current_user.id,
+            UserChatHistory.created_at >= start_date
+        ).scalar() or 0
+        
+        # Calculate accuracy rate (assume we track this in scan history)
+        # For example: if confidence > 0.7, consider it accurate
+        accurate_scans = db.query(func.count(UserScanHistory.id)).filter(
+            UserScanHistory.user_id == current_user.id,
+            UserScanHistory.created_at >= start_date,
+            UserScanHistory.confidence > 0.7
+        ).scalar() or 0
+        
+        accuracy_rate = (accurate_scans / total_scans * 100) if total_scans > 0 else 0
+        
+        # Get most common diseases
+        most_common_diseases = []
+        disease_results = db.query(
+            UserScanHistory.disease_result,
+            func.count(UserScanHistory.disease_result).label('count')
+        ).filter(
+            UserScanHistory.user_id == current_user.id,
+            UserScanHistory.created_at >= start_date
+        ).group_by(UserScanHistory.disease_result).order_by(text('count DESC')).limit(5).all()
+        
+        for disease in disease_results:
+            percentage = round((disease.count / total_scans * 100) if total_scans > 0 else 0, 1)
+            most_common_diseases.append({
+                "name": disease.disease_result,
+                "count": disease.count,
+                "percentage": percentage
+            })
+        
+        # Get most recommended crops
+        most_recommended_crops = []
+        crop_results = db.query(
+            UserCropHistory.recommended_crop,
+            func.count(UserCropHistory.recommended_crop).label('count')        ).filter(
+            UserCropHistory.user_id == current_user.id,
+            UserCropHistory.created_at >= start_date if hasattr(UserCropHistory, 'created_at') else True
+        ).group_by(UserCropHistory.recommended_crop).order_by(text('count DESC')).limit(5).all()
+        
+        for crop in crop_results:
+            # Calculate success rate for each crop
+            successful_implementations = db.query(func.count(UserCropHistory.id)).filter(
+                UserCropHistory.user_id == current_user.id,
+                UserCropHistory.recommended_crop == crop.recommended_crop,
+                UserCropHistory.implementation_status == 'successful'
+            ).scalar() or 0
+            
+            total_implementations = crop.count
+            success_rate = round((successful_implementations / total_implementations * 100) 
+                               if total_implementations > 0 else 0, 1)
+            
+            most_recommended_crops.append({
+                "name": crop.recommended_crop,
+                "count": crop.count,
+                "success_rate": success_rate
+            })
+          # Calculate overall implementation success rate
+        successful_crops = db.query(func.count(UserCropHistory.id)).filter(
+            UserCropHistory.user_id == current_user.id,
+            UserCropHistory.created_at >= start_date if hasattr(UserCropHistory, 'created_at') else True,
+            UserCropHistory.implementation_status == 'successful' if hasattr(UserCropHistory, 'implementation_status') else True
+        ).scalar() or 0
+        
+        implementation_success_rate = (successful_crops / total_crop_plans * 100) if total_crop_plans > 0 else 0
+        
+        # Get monthly activity (for the past year)
+        months = 12
+        monthly_scans = [0] * months
+        monthly_crop_plans = [0] * months
+        monthly_chat_sessions = [0] * months
+        
+        # Get recent achievements
+        recent_achievements = []
+        achievements = db.query(UserAchievements).filter(
+            UserAchievements.user_id == current_user.id,
+            UserAchievements.unlocked_at >= start_date
+        ).order_by(UserAchievements.unlocked_at.desc()).limit(3).all()
+        
+        for achievement in achievements:
+            recent_achievements.append({
+                "name": achievement.achievement_name,
+                "description": achievement.description,
+                "points": achievement.points_earned,
+                "unlocked_at": achievement.unlocked_at.isoformat() if achievement.unlocked_at else None
+            })
+        
+        # If we don't have enough real achievements, add some placeholders
+        if len(recent_achievements) < 3:
+            placeholder_achievements = [
+                {
+                    "name": "Crop Expert",
+                    "description": "Successfully implemented 5 crop recommendations",
+                    "points": 50,
+                    "unlocked_at": None
+                },
+                {
+                    "name": "Disease Detective",
+                    "description": "Identified 10 plant diseases accurately",
+                    "points": 75,
+                    "unlocked_at": None
+                },
+                {
+                    "name": "AI Conversationalist",
+                    "description": "Had 20 productive AI chat sessions",
+                    "points": 30,
+                    "unlocked_at": None
+                }
+            ]
+            
+            for i in range(3 - len(recent_achievements)):
+                if i < len(placeholder_achievements):
+                    recent_achievements.append(placeholder_achievements[i])
+        
+        # Assemble and return the dashboard data
+        return {
+            "total_scans": total_scans,
+            "total_crop_plans": total_crop_plans,
+            "total_chat_sessions": total_chat_sessions,
+            "accuracy_rate": round(accuracy_rate, 1),
+            "most_common_diseases": most_common_diseases,
+            "most_recommended_crops": most_recommended_crops,
+            "monthly_activity": {
+                "scans": monthly_scans,
+                "crop_plans": monthly_crop_plans,
+                "chat_sessions": monthly_chat_sessions
+            },
+            "recent_achievements": recent_achievements,
+            "implementation_success_rate": round(implementation_success_rate, 1)
         }
-        for disease in disease_counts
-    ]
     
-    # Calculate most recommended crops
-    crop_counts = db.query(
-        UserCropHistory.recommended_crop,
-        func.count(UserCropHistory.recommended_crop).label('count')
-    ).filter(
-        UserCropHistory.user_id == current_user.id,
-        UserCropHistory.created_at >= start_date
-    ).group_by(UserCropHistory.recommended_crop).order_by(text('count DESC')).limit(5).all()
-    
-    most_recommended_crops = [
-        {
-            "name": crop.recommended_crop,
-            "count": crop.count,
-            "success_rate": 85  # Default success rate - could be calculated from implementation_status
-        }
-        for crop in crop_counts
-    ]
-    
-    # Calculate implementation success rate
-    total_plans = db.query(UserCropHistory).filter(
-        UserCropHistory.user_id == current_user.id
-    ).count()
-    
-    successful_plans = db.query(UserCropHistory).filter(
-        UserCropHistory.user_id == current_user.id,
-        UserCropHistory.implementation_status == 'completed'
-    ).count()
-    
-    implementation_success_rate = round((successful_plans / max(total_plans, 1)) * 100, 1)
-    
-    # Get recent achievements
-    recent_achievements = db.query(UserAchievements).filter(
-        UserAchievements.user_id == current_user.id
-    ).order_by(UserAchievements.unlocked_at.desc()).limit(5).all()
-    
-    achievements_data = [        {
-            "name": achievement.achievement_name,
-            "unlocked_at": achievement.unlocked_at.isoformat() if achievement.unlocked_at else None,
-            "points": achievement.points_earned or 0
-        }
-        for achievement in recent_achievements
-    ]
-    
-    # Mock monthly activity data (would need complex queries for actual data)
-    monthly_activity = {
-        "scans": [0] * 12,
-        "crop_plans": [0] * 12,
-        "chat_sessions": [0] * 12
-    }
-    
-    stats = DashboardStats(
-        total_scans=total_scans,
-        total_crop_plans=total_crop_plans,
-        total_chat_sessions=total_chat_sessions,
-        accuracy_rate=85.5,  # Could be calculated from confidence scores
-        most_common_diseases=most_common_diseases,
-        most_recommended_crops=most_recommended_crops,
-        monthly_activity=monthly_activity,
-        recent_achievements=achievements_data,
-        implementation_success_rate=implementation_success_rate
-    )
-    
-    return stats
+    except Exception as e:
+        logger.error(f"Error getting dashboard data: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching dashboard data: {str(e)}"
+        )
 
 @router.get("/scans", response_model=List[ScanHistoryItem])
 async def get_scan_history(

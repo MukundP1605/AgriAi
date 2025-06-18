@@ -163,12 +163,11 @@ const Topbar = () => {
             <div className="relative">
               <User className="w-6 h-6 text-cyan-400" />
               <div className="absolute inset-0 w-6 h-6 bg-cyan-400/20 rounded-full blur-sm"></div>
-            </div>
-            <div className="text-sm">
+            </div>            <div className="text-sm">
               <p className="text-white font-medium">
                 {currentUser?.fullName || currentUser?.email || 'Guest'}
               </p>
-              <p className="text-xs text-gray-400">Administrator</p>
+              <p className="text-xs text-gray-400">{currentUser?.role || 'User'}</p>
             </div>
           </motion.div>
 

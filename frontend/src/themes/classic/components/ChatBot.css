@@ -10,8 +10,8 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #111827 !important;
-  color: #f9fafb !important;
+  background: #f8f9fa !important;
+  color: #333 !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #111827 !important;
+  background: #f8f9fa !important;
 }
 
 /* Welcome Section */
@@ -42,20 +42,20 @@
 }
 
 .quick-prompt-bubble {
-  background: #374151;
-  color: #e5e7eb;
+  background: #e9ecef;
+  color: #000;
   padding: 1rem 1.5rem;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   font-size: 16px;
-  border: 1px solid #4b5563;
+  border: 1px solid #ced4da;
 }
 
 .quick-prompt-bubble:hover {
-  background: #4b5563;
-  border-color: #6b7280;
+  background: #e2e6ea;
+  border-color: #ced4da;
   transform: translateY(-1px);
 }
 
@@ -124,21 +124,30 @@
 }
 
 .message-bubble.bot {
-  background: #374151 !important;
-  color: #f9fafb !important;
+  background-color: #e9ecef !important;
+  color: black !important;
   border-bottom-left-radius: 6px;
+  border: 1px solid #ced4da !important;
 }
 
 .message-bubble.user {
-  background: #10b981 !important;
+  background-color: #007bff !important;
   color: white !important;
   border-bottom-right-radius: 6px;
+}
+
+/* Force text colors with highest specificity */
+.modern-chat-container .messages-list .message-container.bot .message-bubble.bot .message-text {
+  color: black !important;
+}
+
+.modern-chat-container .messages-list .message-container.user .message-bubble.user .message-text {
+  color: white !important;
 }
 
 .message-text {
   line-height: 1.5;
   font-size: 15px;
-  color: inherit !important;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -179,8 +188,8 @@
 
 /* Input Area */
 .chat-input-area {
-  border-top: 1px solid #374151;
-  background: #1f2937;
+  border-top: 1px solid #dee2e6;
+  background: #f8f9fa;
   padding: 1rem;
 }
 
@@ -198,15 +207,16 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-end;
-  background: #374151;
+  background: #fff;
   border-radius: 24px;
   padding: 8px;
-  border: 1px solid #4b5563;
+  border: 1px solid #ced4da;
   transition: border-color 0.2s ease;
 }
 
 .input-wrapper:focus-within {
-  border-color: #10b981;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .message-input {
@@ -215,7 +225,7 @@
   border: none;
   outline: none;
   padding: 12px 16px;
-  color: #f9fafb;
+  color: #333;
   font-size: 15px;
   resize: none;
   min-height: 20px;
@@ -224,7 +234,7 @@
 }
 
 .message-input::placeholder {
-  color: #9ca3af;
+  color: #6c757d;
 }
 
 .message-input:disabled {
@@ -233,7 +243,7 @@
 }
 
 .send-button {
-  background: #10b981;
+  background: #007bff;
   color: white;
   border: none;
   border-radius: 16px;
@@ -250,7 +260,7 @@
 }
 
 .send-button:hover:not(:disabled) {
-  background: #059669;
+  background: #0069d9;
   transform: translateY(-1px);
 }
 
@@ -270,12 +280,12 @@
 }
 
 .messages-list::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: #ced4da;
   border-radius: 3px;
 }
 
 .messages-list::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: #adb5bd;
 }
 
 /* Mobile Responsive */

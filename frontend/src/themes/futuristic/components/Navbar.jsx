@@ -191,9 +191,7 @@ const Navbar = () => {
               }}>
                 <Link to="/profile" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Profile</Link>
                 <Link to="/cart" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Cart</Link>
-                <Link to="/order-history" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Order History</Link>
-                <Link to="/history" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>History</Link>
-                <Link to="/enhanced-dashboard" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Dashboard</Link>
+                <Link to="/order-history" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Order History</Link>                <Link to="/history" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>History</Link>                <Link to="/enhanced-dashboard" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Dashboard</Link>
                 <Link to="/settings" style={{ display: 'block', padding: '8px 15px', color: 'white', textDecoration: 'none' }}>Settings</Link>
                 <button 
                   onClick={handleLogout}
@@ -201,7 +199,7 @@ const Navbar = () => {
                     display: 'block', 
                     width: '100%',
                     padding: '8px 15px', 
-                    color: '#ff4444', 
+                    color: '#ff4444',
                     background: 'none',
                     border: 'none',
                     textAlign: 'left',

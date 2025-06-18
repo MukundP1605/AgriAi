@@ -20,17 +20,18 @@ import Settings from './pages/Settings';
 import History from './pages/History';
 import TestEnhancedFeatures from './pages/TestEnhancedFeatures';
 import EnhancedDashboard from './pages/EnhancedDashboard';
+import CropManagementDashboard from './components/CropManagement/CropManagementDashboard';
 import ThemeDemo from './components/ThemeDemo';
 import { AuthProvider } from '../../context/AuthContext';
 import './styles/dashboard.css';
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideFooter = ['/chat'].includes(location.pathname);
-  return (
-    <div className="theme-futuristic min-h-screen w-full h-full bg-[#0a0a0f] text-white overflow-hidden">
-      <Navbar />
-      <div className="relative h-screen w-full bg-transparent text-white">        <Routes>
+  const hideFooter = ['/chat'].includes(location.pathname);  return (
+    <div className="theme-futuristic min-h-screen w-full h-full bg-[#0a0a0f] text-white">
+      <Navbar />      
+      <div className="relative w-full bg-transparent text-white">
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/crop" element={<Crop />} />
           <Route path="/disease" element={<DiseaseUpload />} />
@@ -46,9 +47,9 @@ const AppLayout = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />
-          <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />
+          <Route path="/history" element={<History />} />          <Route path="/test-enhanced" element={<TestEnhancedFeatures />} />
+          <Route path="/enhanced-dashboard" element={<EnhancedDashboard />} />          <Route path="/crop-management" element={<CropManagementDashboard />} />
+          <Route path="/crop-management/session/:sessionId" element={<CropManagementDashboard />} />
           <Route path="/theme-demo" element={<ThemeDemo />} />
           <Route path="*" element={<Login />} />
         </Routes>
@@ -61,9 +62,9 @@ const AppLayout = () => {
 export default function FuturisticApp() {
   return (
     <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
+        <Router>
+          <AppLayout />
+        </Router>
     </AuthProvider>
   );
 }

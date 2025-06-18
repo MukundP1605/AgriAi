@@ -61,9 +61,15 @@ const ChatBot = ({ messages, onSendMessage, isLoading }) => {
                 <div className="bot-avatar">
                   <div className="avatar-icon">🌾</div>
                 </div>
-              )}
-              <div className={`message-bubble ${message.sender}`}>
-                <div className="message-text">
+              )}              <div className={`message-bubble ${message.sender}`}
+                style={{
+                  background: message.sender === 'bot' ? '#e9ecef' : '#007bff',
+                  border: message.sender === 'bot' ? '1px solid #ced4da' : 'none'
+                }}>
+                <div className="message-text" style={{
+                  color: message.sender === 'bot' ? 'black' : 'white',
+                  fontWeight: 'normal'
+                }}>
                   {message.text}
                 </div>
               </div>
