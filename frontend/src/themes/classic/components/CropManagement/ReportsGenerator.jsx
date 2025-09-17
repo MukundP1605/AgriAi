@@ -159,7 +159,7 @@ const ReportsGenerator = ({ sessionId }) => {
               </p>
               <p className="flex justify-between">
                 <span className="text-gray-600">Sale Price:</span>
-                <span className="font-medium">${reportData.harvest_summary.sale_price} per {reportData.harvest_summary.unit}</span>
+                <span className="font-medium">₹{reportData.harvest_summary.sale_price} per {reportData.harvest_summary.unit}</span>
               </p>
             </div>
           </div>
@@ -169,7 +169,7 @@ const ReportsGenerator = ({ sessionId }) => {
             <div className="space-y-2">
               <p className="flex justify-between">
                 <span className="text-gray-600">Total Cost:</span>
-                <span className="font-medium">${reportData.financial_summary.total_cost.toFixed(2)}</span>
+                <span className="font-medium">₹{reportData.financial_summary.total_cost.toFixed(2)}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-gray-600">Revenue:</span>
@@ -196,7 +196,7 @@ const ReportsGenerator = ({ sessionId }) => {
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-medium text-gray-700 capitalize">{inputType}</h4>
                     <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                      ${reportData.input_summary[inputType].total_cost.toFixed(2)}
+                      ₹{reportData.input_summary[inputType].total_cost.toFixed(2)}
                     </span>
                   </div>
                   <div className="space-y-2">
@@ -222,7 +222,7 @@ const ReportsGenerator = ({ sessionId }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
               <p className="text-gray-500 text-sm mb-1">Total Cost</p>
-              <p className="text-2xl font-bold text-red-600">${reportData.financial_summary.total_cost.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-red-600">₹{reportData.financial_summary.total_cost.toFixed(2)}</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
               <p className="text-gray-500 text-sm mb-1">Total Revenue</p>

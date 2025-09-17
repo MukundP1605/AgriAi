@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const OrderSuccess = () => {
   const { orderId } = useParams();
@@ -79,7 +79,7 @@ const OrderSuccess = () => {
               <span>{new Date(order.created_at).toLocaleDateString()}</span>
             </div>            <div className="flex justify-between mb-2">
               <span className="text-gray-600">Total Amount</span>
-              <span className="font-semibold">${Number(order.total_amount || 0).toFixed(2)}</span>
+              <span className="font-semibold">₹{Number(order.total_amount || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Payment Method</span>
@@ -99,7 +99,7 @@ const OrderSuccess = () => {
                   <p className="font-medium">{item.product.name}</p>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-medium">${(Number(item.price_at_purchase || 0) * item.quantity).toFixed(2)}</p>
+                <p className="font-medium">₹{(Number(item.price_at_purchase || 0) * item.quantity).toFixed(2)}</p>
               </div>
             ))}
           </div>

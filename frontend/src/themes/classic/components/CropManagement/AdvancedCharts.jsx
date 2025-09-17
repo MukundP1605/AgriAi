@@ -174,7 +174,7 @@ const AdvancedCharts = ({ sessionId }) => {
   const formatValue = (value, type) => {
     switch (type) {
       case 'currency':
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+        return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
       case 'percentage':
         return `${value.toFixed(1)}%`;
       case 'decimal':

@@ -11,7 +11,7 @@ export default function ClassicThemeDemo() {
           <h3 className="text-xl font-semibold mb-3 text-agri-green">Themed Card</h3>
           <p className="text-gray-700 mb-4">
             This card uses theme-specific Tailwind classes like bg-agri-card and border-agri-border
-            that won't interfere with the futuristic theme.
+            This is the classic theme component that provides a clean and traditional interface.
           </p>
           <button className="bg-agri-green hover:bg-agri-greenLight text-white px-4 py-2 rounded transition-all duration-300">
             Classic Button
@@ -42,7 +42,7 @@ export default function ClassicThemeDemo() {
         <h3 className="text-xl font-semibold mb-4 text-gray-800">Theme Separation Testing</h3>
         <p className="text-gray-700 mb-4">
           This component demonstrates that the classic theme styles are correctly isolated and won't
-          affect the futuristic theme. The theme-specific classes are prefixed with .theme-classic.
+          This provides a clean, traditional design that's fully contained within the classic theme.
         </p>
         <div className="bg-gradient-to-r from-agri-green to-agri-greenLight p-4 rounded-lg text-white">
           <p>This gradient uses the theme-specific agri colors.</p>

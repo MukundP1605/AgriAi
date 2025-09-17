@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ChatBot from '../components/ChatBot';
 import Footer from '../components/Footer';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Chat = () => {
   const { isAuthenticated, currentUser, getToken } = useAuth();  const [messages, setMessages] = useState([

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import imageCompression from 'browser-image-compression';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const DiseaseUpload = () => {
   const [selectedImage, setSelectedImage] = useState(null);

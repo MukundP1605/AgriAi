@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Marketplace = () => {
   const [products, setProducts] = useState([]);
@@ -171,7 +171,7 @@ const Marketplace = () => {
                   
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-2xl font-bold text-green-600">
-                      ${typeof product.price === 'number' 
+                      ₹{typeof product.price === 'number' 
                         ? product.price.toFixed(2) 
                         : parseFloat(product.price).toFixed(2)}
                     </span>

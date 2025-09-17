@@ -16,7 +16,7 @@ export default {
           border: '#e5e7eb',
           accent: '#10b981',
         },
-        // Dark theme (Futuristic/Apple style)
+        // Classic theme (Clean/Traditional style)
         dark: {
           bg: '#121212',
           elevated: '#1e1e1e',

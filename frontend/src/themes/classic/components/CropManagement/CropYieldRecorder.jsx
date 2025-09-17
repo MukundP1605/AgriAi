@@ -149,9 +149,9 @@ const CropYieldRecorder = ({ sessionId }) => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount);
   };
 
@@ -327,7 +327,7 @@ const CropYieldRecorder = ({ sessionId }) => {
             
             <div>
               <label htmlFor="sale_price" className="block text-sm font-medium text-gray-700 mb-1">
-                Sale Price (USD)
+                Sale Price (INR)
               </label>
               <input
                 type="number"

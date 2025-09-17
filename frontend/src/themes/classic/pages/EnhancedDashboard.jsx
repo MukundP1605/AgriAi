@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import UserProfile from '../components/Profile/UserProfile';
 import EnhancedDashboard from '../components/Dashboard/EnhancedDashboard';

@@ -22,7 +22,7 @@ import Marketplace from './pages/Marketplace';
 import Cart from './pages/Cart';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderHistory from './pages/OrderHistory';
-import { AuthProvider } from '../../context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import './components/gridPattern.css';
 import './components/darkModeAnimations.css';
 

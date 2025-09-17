@@ -10,17 +10,8 @@
     "preview": "vite preview",
     "build:css": "tailwindcss -i ./input.css -o ./output.css",
     "build:css:classic": "tailwindcss -i ./src/themes/classic/input.css -o ./src/themes/classic/output.css --config ./tailwind.classic.config.js",
-    "build:css:futuristic": "tailwindcss -i ./src/themes/futuristic/input.css -o ./src/themes/futuristic/output.css --config ./tailwind.futuristic.config.js",
-    "build:css:all": "npm run build:css:classic && npm run build:css:futuristic",
-    "build:themes": "node build-themes.js",
-    "dev:with-themes": "npm run build:css:all && npm run dev",
-    "watch:themes": "node watch-themes.js",
-    "dev:full": "node dev-with-themes.js",
-    "theme:toggle": "node toggle-theme.js",
-    "theme:classic": "node toggle-theme.js classic",
-    "theme:futuristic": "node toggle-theme.js futuristic",
-    "test:theme-separation": "node theme-separation-test.js",
-    "debug:theme": "node debug-theme.js"
+    "build:themes": "npm run build:css:classic",
+    "dev:with-themes": "npm run build:css:classic && npm run dev"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -28,6 +19,7 @@
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.1",
+    "@react-spring/three": "^10.0.1",
     "@react-three/drei": "^10.1.2",
     "@react-three/fiber": "^9.1.2",
     "axios": "^1.9.0",
@@ -44,8 +36,11 @@
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.6.0",
+    "react-tsparticles": "^2.12.2",
     "recharts": "^2.15.3",
-    "three": "^0.177.0"
+    "three": "^0.177.0",
+    "tsparticles": "^3.8.1",
+    "tsparticles-slim": "^2.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

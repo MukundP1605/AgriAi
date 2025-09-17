@@ -8,8 +8,8 @@ Sure, yeh raha complete list including frontend:
 
 1. **Activate Virtual Env**:
 
-   ```
-   .\venv\Scripts\activate ; cd backend ;   uvicorn app.main:app --reload
+   ```.\venv\Scripts\activate ; cd backend ;   uvicorn app.main:app --reload
+   
    ```
 
 2. **Install Dependencies**:

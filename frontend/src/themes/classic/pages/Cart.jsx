@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -143,7 +143,7 @@ const Cart = () => {
               <div className="flex-grow">
                 <h3 className="text-lg font-semibold text-green-700">{item.product.name}</h3>
                 <p className="text-gray-500 text-sm">{item.product.category}</p>
-                <p className="text-green-600 font-bold">${Number(item.product.price || 0).toFixed(2)}</p>
+                <p className="text-green-600 font-bold">₹{Number(item.product.price || 0).toFixed(2)}</p>
               </div>
               
               <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ const Cart = () => {
                 </button>
               </div>
                 <div className="text-right">
-                <p className="font-bold">${(Number(item.product.price || 0) * item.quantity).toFixed(2)}</p>
+                <p className="font-bold">₹{(Number(item.product.price || 0) * item.quantity).toFixed(2)}</p>
                 <button
                   onClick={() => handleRemoveItem(item.id)}
                   className="text-red-600 text-sm hover:underline mt-1"
@@ -179,7 +179,7 @@ const Cart = () => {
           <h2 className="text-xl font-bold mb-4">Order Summary</h2>
             <div className="flex justify-between mb-2">
             <span>Subtotal</span>
-            <span>${Number(totalAmount || 0).toFixed(2)}</span>
+            <span>₹{Number(totalAmount || 0).toFixed(2)}</span>
           </div>
           
           <div className="flex justify-between mb-2">
@@ -191,7 +191,7 @@ const Cart = () => {
           
           <div className="flex justify-between font-bold text-lg mb-6">
             <span>Total</span>
-            <span>${Number(totalAmount || 0).toFixed(2)}</span>
+            <span>₹{Number(totalAmount || 0).toFixed(2)}</span>
           </div>
           
           {!showCheckout ? (
