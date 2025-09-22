@@ -44,20 +44,20 @@ const AppLayout = () => {
       background: 'radial-gradient(ellipse at center, #16a34a 0%, #15803d 70%, #14532d 100%)',
     }}
   >
-    <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
-      {/* Left Content */}
-      <div className="text-center md:text-left flex-1">
+    <div className="max-w-6xl mx-auto px-4 flex flex-col items-center text-center gap-12">
+      {/* Center Content */}
+      <div className="flex-1">
         <h1 className="text-5xl font-bold mb-6">
           <span className="text-white">Agri</span>
           <span className="text-green-300">AI</span>
         </h1>
-        <p className="text-lg mb-6 max-w-xl">
+        <p className="text-lg mb-6 max-w-xl mx-auto">
           Welcome to AgriAI — your intelligent farming companion. Make smarter decisions, detect
           diseases early, and improve yield with our AI-powered agricultural solutions.
         </p>
 
         {/* Stats */}
-        <div className="flex flex-wrap gap-6 justify-center md:justify-start mb-6">
+        <div className="flex flex-wrap gap-6 justify-center mb-6">
           <div>
             <p className="text-2xl font-bold">20,000+</p>
             <p className="text-sm">Farmers Empowered</p>
@@ -73,7 +73,7 @@ const AppLayout = () => {
         </div>
 
         {/* CTA Buttons */}
-        <div className="flex gap-4 justify-center md:justify-start">
+        <div className="flex gap-4 justify-center">
           <a
             href="/signup"
             className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
