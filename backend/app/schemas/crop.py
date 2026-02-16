@@ -18,3 +18,4 @@ class CropRequest(BaseModel):
 class CropResponse(BaseModel):
     crop: str
 # app/schemas/crop.py (continue after CropResponse)
+# Updated 2026-07-13 19:39:02
