@@ -20,3 +20,4 @@ class CropResponse(BaseModel):
 # app/schemas/crop.py (continue after CropResponse)
 # Updated 2026-07-13 19:39:02
 # Updated 2026-07-13 19:39:07
+# Updated 2026-07-13 19:39:08
