@@ -78,6 +78,8 @@ const AdvancedCharts = ({ sessionId }) => {
       setError(null);
       
       const token = getToken();
+      console.log('Fetching chart data for session:', sessionId, 'with time range:', timeRange);
+      
       // Use graph-data endpoint instead of charts since charts endpoint doesn't exist in backend
       const response = await axios.get(
         `http://127.0.0.1:8000/api/crop-management/graph-data/${sessionId}?time_range=${timeRange}`,
@@ -88,6 +90,9 @@ const AdvancedCharts = ({ sessionId }) => {
           }
         }
       );
+      
+      console.log('Chart data API response:', response.data);
+      console.log('Growth trends data:', response.data?.growth_trends);
       
       setChartData(response.data);
     } catch (err) {
@@ -118,18 +123,21 @@ const AdvancedCharts = ({ sessionId }) => {
         console.log('Insights API response:', response);
       
       // Handle potential empty or malformed insights data
-      if (response && response.data && response.data.insights && response.data.insights.length > 0) {
+      if (response && response.data) {
         console.log('Setting insights data:', response.data);
+        console.log('Insights array:', response.data.insights);
+        console.log('Total insights:', response.data.total_insights);
         setInsightsData(response.data);
       } else {
         // Set default insights structure if none is returned
-        console.log('Setting default insights data');
+        console.log('Setting default insights data - no response data');
         setInsightsData({
           insights: [{
             message: "No specific insights available yet",
             reason: "Continue recording data about your crops to receive personalized recommendations",
             recommendation_type: "info"
-          }]
+          }],
+          total_insights: 1
         });
       }
     } catch (err) {
@@ -172,6 +180,11 @@ const AdvancedCharts = ({ sessionId }) => {
   };
 
   const formatValue = (value, type) => {
+    // Handle null, undefined, or NaN values
+    if (value === null || value === undefined || isNaN(value)) {
+      return 'N/A';
+    }
+    
     switch (type) {
       case 'currency':
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -293,10 +306,10 @@ const AdvancedCharts = ({ sessionId }) => {
                 <div>
                   <p className="text-sm text-green-600 font-medium">Growth Rate</p>
                   <p className="text-xl font-bold text-green-800">
-                    {formatValue(chartData.growth_trends.avg_growth_rate, 'percentage')}
+                    {formatValue(safeAccess(chartData, 'growth_trends.avg_growth_rate', 0), 'percentage')}
                   </p>
                 </div>
-                {getTrendIcon(chartData.growth_trends.growth_trend)}
+                {getTrendIcon(safeAccess(chartData, 'growth_trends.growth_trend', 'stable'))}
               </div>
             </div>
 
@@ -305,7 +318,7 @@ const AdvancedCharts = ({ sessionId }) => {
                 <div>
                   <p className="text-sm text-blue-600 font-medium">Peak Growth</p>
                   <p className="text-xl font-bold text-blue-800">
-                    Day {chartData.growth_trends.peak_growth_day}
+                    Day {safeAccess(chartData, 'growth_trends.peak_growth_day', 0)}
                   </p>
                 </div>
                 <ArrowTrendingUpIcon className="h-6 w-6 text-blue-600" />
@@ -317,7 +330,7 @@ const AdvancedCharts = ({ sessionId }) => {
                 <div>
                   <p className="text-sm text-purple-600 font-medium">Efficiency</p>
                   <p className="text-xl font-bold text-purple-800">
-                    {formatValue(chartData.growth_trends.efficiency_score, 'percentage')}
+                    {formatValue(safeAccess(chartData, 'growth_trends.efficiency_score', 0), 'percentage')}
                   </p>
                 </div>
                 <ChartBarIcon className="h-6 w-6 text-purple-600" />
@@ -329,7 +342,7 @@ const AdvancedCharts = ({ sessionId }) => {
                 <div>
                   <p className="text-sm text-orange-600 font-medium">Variability</p>
                   <p className="text-xl font-bold text-orange-800">
-                    {formatValue(chartData.growth_trends.variability, 'decimal')}
+                    {formatValue(safeAccess(chartData, 'growth_trends.variability', 0), 'decimal')}
                   </p>
                 </div>
                 <AdjustmentsHorizontalIcon className="h-6 w-6 text-orange-600" />
@@ -341,7 +354,7 @@ const AdvancedCharts = ({ sessionId }) => {
           <div className="bg-gray-50 p-6 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Crop Growth Over Time</h3>
             <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={chartData.growth_trends.data}>
+              <AreaChart data={safeAccess(chartData, 'growth_trends.data', [])}>
                 <defs>
                   <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
@@ -382,7 +395,7 @@ const AdvancedCharts = ({ sessionId }) => {
           <div className="bg-gray-50 p-6 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Growth Rate</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData.growth_trends.growth_rate_data}>
+              <BarChart data={safeAccess(chartData, 'growth_trends.growth_rate_data', [])}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis label={{ value: 'Growth Rate (cm/day)', angle: -90, position: 'insideLeft' }} />

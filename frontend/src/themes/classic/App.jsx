@@ -22,7 +22,7 @@ import { AuthProvider } from './context/AuthContext';
 const AppLayout = () => {
   const location = useLocation();
   const hideHeroSection = ['/chat', '/crop', '/disease', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup'].includes(location.pathname);
-  const hideFooter = ['/chat'].includes(location.pathname); // Only hide footer on chat page
+  const hideFooter = ['/chat', '/login', '/signup', '/enhanced-dashboard', '/crop-management'].includes(location.pathname) || location.pathname.startsWith('/crop-management/'); // Hide footer on specific pages
   
   return (
     <div className="min-h-screen bg-white text-gray-900">

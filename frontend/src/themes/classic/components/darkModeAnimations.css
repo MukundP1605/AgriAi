@@ -1,1 +1,29 @@
 /* No custom animations or effects. Minimal light mode only, matching original AgriAI homepage. */
+
+/* Dropdown fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Enhanced hover animations for dropdowns */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease-out;
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}

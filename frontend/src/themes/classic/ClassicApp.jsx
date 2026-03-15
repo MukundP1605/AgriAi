@@ -18,19 +18,22 @@ import TestEnhancedFeatures from './pages/TestEnhancedFeatures';
 import EnhancedDashboard from './pages/EnhancedDashboard';
 import CropManagementDashboard from './components/CropManagement/CropManagementDashboard';
 import ClassicThemeDemo from './components/ClassicThemeDemo';
+import WeatherTest from './components/Weather/WeatherTest';
+import LocationDiagnostic from './components/LocationDiagnostic';
 import Marketplace from './pages/Marketplace';
 import Cart from './pages/Cart';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderHistory from './pages/OrderHistory';
 import { AuthProvider } from './context/AuthContext';
+import { WeatherProvider } from '../../context/WeatherContext';
 import './components/gridPattern.css';
 import './components/darkModeAnimations.css';
 
 const AppLayout = () => {
   const location = useLocation();  
   const hideHeroSection = ['/chat', '/crop', '/disease', '/fertilizer', '/profile', '/settings', '/history', '/test-enhanced', '/enhanced-dashboard', '/login', '/signup', '/marketplace', '/cart', '/order-history', '/order-success', '/crop-session'].includes(location.pathname) || location.pathname.startsWith('/order-success/') || location.pathname.startsWith('/crop-session/');  
-  // Show footer on all pages
-  const hideFooter = [];
+  // Hide footer on login, signup, enhanced dashboard, chat, and crop management pages
+  const hideFooter = ['/login', '/signup', '/enhanced-dashboard', '/chat', '/advanced-chat', '/crop-management'].includes(location.pathname) || location.pathname.startsWith('/crop-management/');
   
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
@@ -106,6 +109,7 @@ const AppLayout = () => {
           <Route path="/disease" element={<DiseaseUpload />} />
           <Route path="/fertilizer" element={<Fertilizer />} />
           <Route path="/chat" element={<Chat />} />
+          
           <Route path="/about" element={<About />} />
           <Route path="/forms" element={<AgriAIFormsPage />} />
           <Route path="/login" element={<Login />} />
@@ -117,6 +121,8 @@ const AppLayout = () => {
           <Route path="/crop-management/session/:sessionId" element={<CropManagementDashboard />} />
   
           <Route path="/theme-demo" element={<ClassicThemeDemo />} />
+          <Route path="/weather-test" element={<WeatherTest />} />
+          <Route path="/location-diagnostic" element={<LocationDiagnostic />} />
           <Route path="/marketplace" element={<Marketplace />} />          <Route path="/cart" element={<Cart />} />
           <Route path="/order-success/:orderId" element={<OrderSuccess />} />
           <Route path="/order-history" element={<OrderHistory />} />
@@ -131,9 +137,11 @@ const AppLayout = () => {
 export default function ClassicApp() {
   return (
     <AuthProvider>
+      <WeatherProvider>
         <Router>
           <AppLayout />
         </Router>
+      </WeatherProvider>
     </AuthProvider>
   );
 }

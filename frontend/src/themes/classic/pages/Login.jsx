@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Footer from "../components/Footer";
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -190,7 +189,6 @@ const Login = () => {
           </p>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

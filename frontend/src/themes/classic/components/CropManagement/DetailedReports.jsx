@@ -49,9 +49,11 @@ const DetailedReports = ({ sessionId }) => {
         }
       );
       
+      console.log('Detailed Reports Response:', response.data);
       setDetailedReports(response.data);
     } catch (err) {
       console.error('Error fetching detailed reports:', err);
+      console.error('Error details:', err.response);
       setError(err.response?.data?.detail || 'Failed to fetch detailed reports. Please ensure all data is recorded.');
     } finally {
       setIsLoading(false);
@@ -156,7 +158,7 @@ const DetailedReports = ({ sessionId }) => {
           </div>
         </div>
         <div className="text-sm text-gray-500">
-          Generated: {formatDate(detailedReports.generated_at)}
+          Generated: {detailedReports.generated_at ? formatDate(detailedReports.generated_at) : 'Recently'}
         </div>
       </div>
 
@@ -195,7 +197,7 @@ const DetailedReports = ({ sessionId }) => {
                 <div>
                   <p className="text-green-600 text-sm font-medium">Total Yield</p>
                   <p className="text-2xl font-bold text-green-800">
-                    {detailedReports.total_yield} {detailedReports.yield_unit}
+                    {detailedReports.total_yield || 'N/A'} {detailedReports.yield_unit || ''}
                   </p>
                 </div>
                 <CheckCircleIcon className="h-10 w-10 text-green-600" />
@@ -207,7 +209,7 @@ const DetailedReports = ({ sessionId }) => {
                 <div>
                   <p className="text-blue-600 text-sm font-medium">Session Duration</p>
                   <p className="text-2xl font-bold text-blue-800">
-                    {detailedReports.session_duration} days
+                    {detailedReports.session_duration || 0} days
                   </p>
                 </div>
                 <ClockIcon className="h-10 w-10 text-blue-600" />
@@ -219,7 +221,7 @@ const DetailedReports = ({ sessionId }) => {
                 <div>
                   <p className="text-purple-600 text-sm font-medium">Overall Rating</p>
                   <p className="text-2xl font-bold text-purple-800">
-                    {detailedReports.overall_rating}/5
+                    {detailedReports.overall_rating || 'N/A'}/5
                   </p>
                 </div>
                 <ArrowTrendingUpIcon className="h-10 w-10 text-purple-600" />

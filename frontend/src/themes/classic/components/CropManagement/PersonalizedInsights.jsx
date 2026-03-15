@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useWeather } from '../../../../context/WeatherContext';
 import {
   LightBulbIcon,
   StarIcon,
@@ -22,11 +23,13 @@ import {
 
 const PersonalizedInsights = ({ sessionId }) => {
   const { getToken } = useAuth();
+  const { getAgriculturalInsights, weatherData, getCurrentWeather, getForecast } = useWeather();
   const [insights, setInsights] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeInsightType, setActiveInsightType] = useState('all');
   const [favoriteInsights, setFavoriteInsights] = useState([]);
+  const [weatherInsights, setWeatherInsights] = useState([]);
 
   const insightTypes = [
     { id: 'all', name: 'All Insights', icon: LightBulbIcon },
@@ -65,6 +68,121 @@ const PersonalizedInsights = ({ sessionId }) => {
     }
   }, [sessionId]);
 
+  // Fetch and process weather insights
+  useEffect(() => {
+    const processWeatherInsights = () => {
+      const agricInsights = getAgriculturalInsights();
+      const currentWeather = getCurrentWeather();
+      const forecast = getForecast(3); // Next 3 days
+      
+      if (agricInsights && agricInsights.length > 0) {
+        // Convert weather insights to match the PersonalizedInsights format
+        const processedWeatherInsights = agricInsights.map((insight, index) => ({
+          id: `weather_${index}`,
+          type: insight.category,
+          priority: insight.priority,
+          title: insight.title,
+          description: insight.message,
+          confidence: 85, // Weather data is generally reliable
+          category: 'weather_tips',
+          is_actionable: true,
+          created_at: new Date().toISOString(),
+          tags: [insight.category, 'weather', 'real_time'],
+          impact_level: insight.priority === 'high' ? 'high' : insight.priority === 'medium' ? 'medium' : 'low'
+        }));
+        
+        // Add crop-specific weather recommendations
+        if (currentWeather && forecast) {
+          const cropSpecificInsights = generateCropSpecificWeatherInsights(currentWeather, forecast);
+          processedWeatherInsights.push(...cropSpecificInsights);
+        }
+        
+        setWeatherInsights(processedWeatherInsights);
+      }
+    };
+
+    if (weatherData) {
+      processWeatherInsights();
+    }
+  }, [weatherData, getAgriculturalInsights, getCurrentWeather, getForecast]);
+
+  const generateCropSpecificWeatherInsights = (currentWeather, forecast) => {
+    const insights = [];
+    let insightId = 100;
+
+    // Irrigation recommendations based on weather
+    const upcomingRain = forecast.slice(0, 3).reduce((total, day) => total + (day.precipitation || 0), 0);
+    
+    if (upcomingRain > 20) {
+      insights.push({
+        id: `weather_irrigation_${insightId++}`,
+        type: 'water_management',
+        priority: 'medium',
+        title: 'Reduce Irrigation - Heavy Rain Expected',
+        description: `${upcomingRain.toFixed(1)}mm of rain expected in the next 3 days. Consider reducing irrigation schedules to prevent waterlogging and optimize water usage.`,
+        confidence: 90,
+        category: 'water_management',
+        is_actionable: true,
+        created_at: new Date().toISOString(),
+        tags: ['irrigation', 'water_management', 'weather_forecast'],
+        impact_level: 'medium'
+      });
+    } else if (upcomingRain < 5 && currentWeather && parseInt(currentWeather.temperature) > 25) {
+      insights.push({
+        id: `weather_irrigation_${insightId++}`,
+        type: 'water_management',
+        priority: 'high',
+        title: 'Increase Irrigation - Hot & Dry Conditions',
+        description: `Low rainfall (${upcomingRain.toFixed(1)}mm) and high temperatures (${currentWeather.temperature}) expected. Increase irrigation frequency to maintain soil moisture.`,
+        confidence: 88,
+        category: 'water_management',
+        is_actionable: true,
+        created_at: new Date().toISOString(),
+        tags: ['irrigation', 'drought_prevention', 'temperature'],
+        impact_level: 'high'
+      });
+    }
+
+    // Pest and disease risk based on weather
+    if (currentWeather && parseInt(currentWeather.humidity.replace('%', '')) > 75 && parseInt(currentWeather.temperature) > 20) {
+      insights.push({
+        id: `weather_pest_${insightId++}`,
+        type: 'risk_management',
+        priority: 'medium',
+        title: 'Increased Fungal Disease Risk',
+        description: `High humidity (${currentWeather.humidity}) and warm temperatures create ideal conditions for fungal diseases. Monitor crops closely and consider preventive treatments.`,
+        confidence: 82,
+        category: 'risk_management',
+        is_actionable: true,
+        created_at: new Date().toISOString(),
+        tags: ['disease_prevention', 'humidity', 'fungal_risk'],
+        impact_level: 'medium'
+      });
+    }
+
+    // Planting/harvesting timing based on weather
+    const nextWeekWeather = forecast.slice(0, 7);
+    const stableWeather = nextWeekWeather.every(day => day.precipitation < 5);
+    
+    if (stableWeather) {
+      insights.push({
+        id: `weather_timing_${insightId++}`,
+        type: 'timing',
+        priority: 'low',
+        title: 'Optimal Weather Window for Field Operations',
+        description: 'Stable, dry weather expected for the next week. This is an excellent time for planting, transplanting, or harvesting activities.',
+        confidence: 85,
+        category: 'timing',
+        is_actionable: true,
+        created_at: new Date().toISOString(),
+        tags: ['planting', 'harvesting', 'field_operations'],
+        impact_level: 'low'
+      });
+    }
+
+    return insights;
+  };
+
   const fetchPersonalizedInsights = async () => {
     try {
       setIsLoading(true);
@@ -80,6 +198,10 @@ const PersonalizedInsights = ({ sessionId }) => {
           }
         }
       );
+      
+      console.log('PersonalizedInsights API response:', response.data);
+      console.log('Insights array:', response.data.insights);
+      console.log('Total insights:', response.data.total_insights);
       
       setInsights(response.data);
     } catch (err) {
@@ -124,6 +246,18 @@ const PersonalizedInsights = ({ sessionId }) => {
         return SunIcon;
       case 'soil_health':
         return SparklesIcon;
+      case 'temperature':
+        return FireIcon;
+      case 'humidity':
+        return BeakerIcon;
+      case 'wind':
+        return CloudIcon;
+      case 'uv':
+        return SunIcon;
+      case 'precipitation':
+        return CloudIcon;
+      case 'growth':
+        return CheckCircleIcon;
       default:
         return LightBulbIcon;
     }
@@ -145,13 +279,17 @@ const PersonalizedInsights = ({ sessionId }) => {
   };
 
   const getFilteredInsights = () => {
-    if (!insights?.recommendations) return [];
+    // Combine regular insights with weather insights
+    const allInsights = [
+      ...(insights?.insights || []),
+      ...weatherInsights
+    ];
     
     if (activeInsightType === 'all') {
-      return insights.recommendations;
+      return allInsights;
     }
     
-    return insights.recommendations.filter(insight => insight.category === activeInsightType);
+    return allInsights.filter(insight => insight.category === activeInsightType);
   };
 
   if (isLoading) {
@@ -224,7 +362,9 @@ const PersonalizedInsights = ({ sessionId }) => {
             <ChartBarIcon className="h-8 w-8 text-blue-600" />
             <div>
               <p className="text-sm text-blue-600 font-medium">Total Insights</p>
-              <p className="text-xl font-bold text-blue-800">{insights.total_insights}</p>
+              <p className="text-xl font-bold text-blue-800">
+                {(insights?.total_insights || 0) + weatherInsights.length}
+              </p>
             </div>
           </div>
         </div>
@@ -234,7 +374,9 @@ const PersonalizedInsights = ({ sessionId }) => {
             <CheckCircleIcon className="h-8 w-8 text-green-600" />
             <div>
               <p className="text-sm text-green-600 font-medium">High Priority</p>
-              <p className="text-xl font-bold text-green-800">{insights.high_priority_count}</p>
+              <p className="text-xl font-bold text-green-800">
+                {(insights?.high_priority_count || 0) + weatherInsights.filter(w => w.priority === 'high').length}
+              </p>
             </div>
           </div>
         </div>
@@ -244,7 +386,15 @@ const PersonalizedInsights = ({ sessionId }) => {
             <ArrowTrendingUpIcon className="h-8 w-8 text-purple-600" />
             <div>
               <p className="text-sm text-purple-600 font-medium">Avg Confidence</p>
-              <p className="text-xl font-bold text-purple-800">{insights.avg_confidence}%</p>
+              <p className="text-xl font-bold text-purple-800">
+                {(() => {
+                  const allInsights = [...(insights?.insights || []), ...weatherInsights];
+                  const avgConf = allInsights.length > 0 
+                    ? Math.round(allInsights.reduce((sum, insight) => sum + insight.confidence, 0) / allInsights.length)
+                    : insights?.avg_confidence || 0;
+                  return avgConf;
+                })()}%
+              </p>
             </div>
           </div>
         </div>
@@ -253,8 +403,8 @@ const PersonalizedInsights = ({ sessionId }) => {
           <div className="flex items-center space-x-3">
             <StarIcon className="h-8 w-8 text-orange-600" />
             <div>
-              <p className="text-sm text-orange-600 font-medium">Favorites</p>
-              <p className="text-xl font-bold text-orange-800">{favoriteInsights.length}</p>
+              <p className="text-sm text-orange-600 font-medium">Weather Insights</p>
+              <p className="text-xl font-bold text-orange-800">{weatherInsights.length}</p>
             </div>
           </div>
         </div>
@@ -349,7 +499,20 @@ const PersonalizedInsights = ({ sessionId }) => {
                       <ArrowTrendingUpIcon className="h-4 w-4 text-green-600" />
                       <span className="font-medium text-gray-900">Expected Impact:</span>
                     </div>
-                    <p className="text-sm text-gray-700 mt-1">{insight.expected_impact}</p>
+                    <div className="text-sm text-gray-700 mt-1">
+                      {typeof insight.expected_impact === 'object' ? (
+                        <ul className="space-y-1">
+                          {Object.entries(insight.expected_impact).map(([key, value]) => (
+                            <li key={key} className="flex justify-between">
+                              <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                              <span className="font-medium">{value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{insight.expected_impact}</p>
+                      )}
+                    </div>
                   </div>
                 )}
 

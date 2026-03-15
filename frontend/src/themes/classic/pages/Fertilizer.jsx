@@ -54,11 +54,14 @@ const Fertilizer = () => {
     field_size: '',
     location: ''
   });
-  const [uploadedFile, setUploadedFile] = useState(null);  const [analysisResults, setAnalysisResults] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFilePath, setUploadedFilePath] = useState(null);
+  const [analysisResults, setAnalysisResults] = useState(null);
   const [schedule, setSchedule] = useState(null);
   const [marketplace, setMarketplace] = useState([]);
   const [fertilizerType, setFertilizerType] = useState('balanced');
   const [loading, setLoading] = useState(false);
+  const [analyzingPdf, setAnalyzingPdf] = useState(false);
   const [errors, setErrors] = useState({});
   const [retryCount, setRetryCount] = useState(0);
   const [npkChartData, setNpkChartData] = useState(null);
@@ -259,6 +262,7 @@ const Fertilizer = () => {
 
       const data = await response.json();
       setSoilData(prev => ({ ...prev, ...data.extracted_data }));
+      setUploadedFilePath(data.file_path); // Store file path for analysis
       setErrors({});
     } catch (error) {
       console.error('Upload error:', error);
@@ -267,6 +271,73 @@ const Fertilizer = () => {
       setLoading(false);
     }
   };
+
+  const handleAnalyzePdf = async () => {
+    if (!uploadedFilePath) {
+      setErrors({ pdf: 'Please upload a soil report first' });
+      return;
+    }
+
+    setAnalyzingPdf(true);
+    setErrors({});
+
+    try {
+      const token = localStorage.getItem('token');
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      
+      const response = await fetch(`${backendUrl}/api/fertilizer/analyze-soil-report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          file_path: uploadedFilePath,
+          crop_type: soilData.crop_type || 'rice'
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Analysis failed: ${response.status} ${response.statusText} - ${errorData}`);
+      }
+
+      const data = await response.json();
+      console.log('PDF Analysis Response:', data);
+      
+      // Update soil data with extracted values
+      if (data.extracted_data) {
+        setSoilData(prev => ({
+          ...prev,
+          nitrogen: data.extracted_data.nitrogen || prev.nitrogen,
+          phosphorus: data.extracted_data.phosphorus || prev.phosphorus,
+          potassium: data.extracted_data.potassium || prev.potassium,
+          ph: data.extracted_data.ph || prev.ph,
+          organic_matter: data.extracted_data.organic_matter || prev.organic_matter,
+          moisture: data.extracted_data.moisture || prev.moisture,
+          location: data.extracted_data.location || prev.location
+        }));
+      }
+      
+      // Set analysis results
+      setAnalysisResults(data);
+      setSchedule(data.application_schedule);
+      setMarketplace(data.marketplace_matches || []);
+      
+      // Generate chart data
+      generateChartData(data);
+      
+      // Switch to results tab
+      setActiveTab('results');
+      
+    } catch (error) {
+      console.error('PDF Analysis error:', error);
+      setErrors({ pdf: error.message });
+    } finally {
+      setAnalyzingPdf(false);
+    }
+  };
+
   const downloadReport = async () => {
     if (!analysisResults) return;
 
@@ -617,12 +688,61 @@ const Fertilizer = () => {
                 />
 
                 {uploadedFile && (
-                  <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-800">
-                      <CheckCircle className="w-5 h-5" />
-                      <span className="font-medium">File uploaded successfully</span>
+                  <div className="mt-4 space-y-4">
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <div className="flex items-center gap-2 text-green-800">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-medium">File uploaded successfully</span>
+                      </div>
+                      <p className="text-green-600 text-sm mt-1">{uploadedFile.name}</p>
                     </div>
-                    <p className="text-green-600 text-sm mt-1">{uploadedFile.name}</p>
+                    
+                    {/* Analyze PDF Button */}
+                    <button
+                      onClick={handleAnalyzePdf}
+                      disabled={analyzingPdf || !uploadedFilePath}
+                      className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      {analyzingPdf ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Analyzing PDF Report...
+                        </>
+                      ) : (
+                        <>
+                          <BarChart3 className="w-5 h-5" />
+                          Analyze PDF & Get Fertilizer Recommendations
+                        </>
+                      )}
+                    </button>
+                    
+                    <p className="text-sm text-gray-600 text-center">
+                      Our AI will extract soil data from your report and provide personalized fertilizer recommendations
+                    </p>
+                    
+                    {/* PDF Analysis Error */}
+                    {errors.pdf && (
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-red-800">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Analysis Error</span>
+                        </div>
+                        <p className="text-red-700 text-sm mt-1">{errors.pdf}</p>
+                      </div>
+                    )}
+                    
+                    {/* PDF Analysis Success */}
+                    {analysisResults && !errors.pdf && uploadedFile && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-blue-800">
+                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Analysis Complete!</span>
+                        </div>
+                        <p className="text-blue-700 text-sm mt-1">
+                          Fertilizer recommendations are ready. Check the Results tab.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Footer from "../components/Footer";
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -242,7 +241,6 @@ const SignUp = () => {
         </p>
       </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import relationship
 from pydantic import BaseModel
 from app.database import Base
 
@@ -20,3 +21,17 @@ class DBUser(Base):
     farm_size = Column(String(50), nullable=True)  # e.g., "1-5 acres", "5-20 acres"
     primary_crops = Column(String(255), nullable=True)  # comma-separated crops
     farming_experience = Column(String(50), nullable=True)  # e.g., "beginner", "intermediate", "expert"
+    
+    # Relationships to other models
+    crop_sessions = relationship("CropSession", back_populates="user")
+    reports = relationship("Report", back_populates="user")
+    scan_history = relationship("UserScanHistory", back_populates="user")
+    crop_history = relationship("UserCropHistory", back_populates="user")
+    chat_history = relationship("UserChatHistory", back_populates="user")
+    activity_logs = relationship("UserActivityLog", back_populates="user")
+    favorites = relationship("UserFavorites", back_populates="user")
+    achievements = relationship("UserAchievements", back_populates="user")
+    fertilizer_history = relationship("FertilizerHistory", back_populates="user")
+    
+    def __repr__(self):
+        return f"<DBUser(id={self.id}, email='{self.email}', full_name='{self.full_name}')>"

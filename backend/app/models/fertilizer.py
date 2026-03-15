@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Text, DateTime, Boolean, JSON
+from sqlalchemy import Column, Integer, String, Float, Text, DateTime, Boolean, JSON, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from app.database import Base
 from datetime import datetime
@@ -8,7 +9,7 @@ class FertilizerHistory(Base):
     __tablename__ = "fertilizer_history"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
     
     # Crop and soil information
     crop_type = Column(String(50), nullable=False)
@@ -35,6 +36,9 @@ class FertilizerHistory(Base):
     area_covered = Column(Float, nullable=True)  # Hectares
     weather_conditions = Column(JSON, nullable=True)  # Weather during application
     yield_improvement = Column(Float, nullable=True)  # Percentage improvement if tracked
+    
+    # Relationships
+    user = relationship("DBUser")
     
     def __repr__(self):
         return f"<FertilizerHistory(id={self.id}, user_id={self.user_id}, crop_type='{self.crop_type}', created_at='{self.created_at}')>"

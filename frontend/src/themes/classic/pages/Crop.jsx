@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useWeather } from '../../../context/WeatherContext';
 
 function Crop() {
   const auth = useAuth();
+  const { getCurrentWeather, weatherData, getAgriculturalInsights } = useWeather();
   console.log('Auth context in Crop:', auth); // Debug log
   
   // Defensive destructuring with default values
@@ -24,6 +26,46 @@ function Crop() {
 
   const [prediction, setPrediction] = useState('');
   const [loading, setLoading] = useState(false);
+  const [weatherSuggestions, setWeatherSuggestions] = useState([]);
+  const [useWeatherData, setUseWeatherData] = useState(false);
+
+  // Auto-populate weather data when available
+  useEffect(() => {
+    if (weatherData && useWeatherData) {
+      const currentWeather = getCurrentWeather();
+      if (currentWeather) {
+        setFormData(prev => ({
+          ...prev,
+          temperature: currentWeather.temperature.replace('°C', ''),
+          humidity: currentWeather.humidity.replace('%', ''),
+          rainfall: '0' // Will be updated based on forecast
+        }));
+      }
+      
+      // Generate weather-based suggestions
+      const insights = getAgriculturalInsights();
+      setWeatherSuggestions(insights.filter(insight => 
+        insight.category === 'optimization' || 
+        insight.category === 'timing' ||
+        insight.category === 'weather_tips'
+      ));
+    }
+  }, [weatherData, useWeatherData, getCurrentWeather, getAgriculturalInsights]);
+
+  const toggleWeatherData = () => {
+    setUseWeatherData(!useWeatherData);
+    if (!useWeatherData && weatherData) {
+      const currentWeather = getCurrentWeather();
+      if (currentWeather) {
+        setFormData(prev => ({
+          ...prev,
+          temperature: currentWeather.temperature.replace('°C', ''),
+          humidity: currentWeather.humidity.replace('%', ''),
+          rainfall: '0'
+        }));
+      }
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -184,10 +226,62 @@ function Crop() {
 
               {/* Environmental Conditions */}
               <div className="space-y-6">
-                <h3 className="text-2xl font-semibold text-gray-900 flex items-center">
-                  <span className="mr-3 text-3xl">🌤️</span>
-                  Environmental Conditions
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-semibold text-gray-900 flex items-center">
+                    <span className="mr-3 text-3xl">🌤️</span>
+                    Environmental Conditions
+                  </h3>
+                  
+                  {/* Weather Integration Toggle */}
+                  {weatherData && (
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm text-gray-600">Use current weather data</span>
+                      <button
+                        type="button"
+                        onClick={toggleWeatherData}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                          useWeatherData ? 'bg-emerald-600' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            useWeatherData ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Weather Status */}
+                {useWeatherData && weatherData && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-blue-600 text-sm font-medium">
+                        ✅ Using real-time weather data from {weatherData.current?.location || 'your location'}
+                      </span>
+                    </div>
+                    {getCurrentWeather() && (
+                      <div className="mt-2 text-sm text-blue-700">
+                        Current: {getCurrentWeather().temperature}, {getCurrentWeather().humidity} humidity, {getCurrentWeather().description}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Weather Suggestions */}
+                {weatherSuggestions.length > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                    <h4 className="text-sm font-medium text-green-800 mb-2">🌱 Weather-Based Recommendations:</h4>
+                    <div className="space-y-2">
+                      {weatherSuggestions.slice(0, 2).map((suggestion, index) => (
+                        <div key={index} className="text-sm text-green-700">
+                          • {suggestion.message}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
@@ -242,14 +336,35 @@ function Crop() {
 
         {/* Results Section */}
         {prediction && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center">
-              <h3 className="text-lg font-medium">
-                Recommended Crop
-              </h3>
+          <div className="mt-6 space-y-4">
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center">
+                <h3 className="text-lg font-medium">
+                  Recommended Crop
+                </h3>
+              </div>
+              <div className="mt-3 text-center">
+                <span className="text-2xl font-bold text-green-600">{prediction}</span>
+              </div>
             </div>
-            <div className="mt-3 text-center">
-              <span className="text-2xl font-bold text-green-600">{prediction}</span>
+            
+            {/* Fertilizer Recommendation Link */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-lg font-medium text-blue-800">Next Step: Get Fertilizer Recommendations</h4>
+                  <p className="text-blue-600 text-sm mt-1">
+                    Upload your soil report or enter soil data to get personalized fertilizer recommendations for {prediction}
+                  </p>
+                </div>
+                <a
+                  href="/fertilizer"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <span className="text-xl">🧪</span>
+                  Fertilizer Guide
+                </a>
+              </div>
             </div>
           </div>
         )}

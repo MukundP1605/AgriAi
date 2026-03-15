@@ -6,9 +6,11 @@ import EnhancedDashboard from '../components/Dashboard/EnhancedDashboard';
 import CropManagementDashboard from '../components/CropManagement/CropManagementDashboard';
 import FarmAnalytics from '../components/CropManagement/FarmAnalytics';
 import AlertManagement from '../components/Alerts/AlertManagement';
+import WeatherWidget from '../components/Weather/WeatherWidget';
+import WeatherForecast from '../components/Weather/WeatherForecast';
+import WeatherInsights from '../components/Weather/WeatherInsights';
 
 // import './EnhancedDashboard.css'; // Optional: Import custom styles for the dashboard
-import Footer from '../components/Footer';
 const EnhancedDashboardPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -53,6 +55,16 @@ const EnhancedDashboardPage = () => {
               🌾 Crop Management
             </button>
             <button
+              onClick={() => setActiveTab('weather')}
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'weather'
+                  ? 'bg-emerald-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
+              }`}
+            >
+              🌤️ Weather & Insights
+            </button>
+            <button
               onClick={() => setActiveTab('alerts')}
               className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                 activeTab === 'alerts'
@@ -89,6 +101,17 @@ const EnhancedDashboardPage = () => {
             </div>
           )}
           
+          {activeTab === 'weather' && (
+            <div className="p-8">
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">Weather & Agricultural Insights</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <WeatherWidget />
+                <WeatherForecast />
+              </div>
+              <WeatherInsights />
+            </div>
+          )}
+          
           {activeTab === 'alerts' && (
             <div className="p-8">
               <h2 className="text-2xl font-semibold mb-6 text-gray-900">Pest & Disease Alert Management</h2>
@@ -104,8 +127,6 @@ const EnhancedDashboardPage = () => {
           )}
         </div>
       </div>   
-  
-      <Footer />
     </div>
   );
 };

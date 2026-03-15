@@ -143,8 +143,16 @@ async def chat_endpoint(
         detected_lang = detect_language(original_message)
         logger.info(f"Detected language: {detected_lang}")
 
-        # Step 2: Predict intent using local model
-        intent, reply = intent_model.predict_intent(original_message)
+        # Step 2: Check if message contains weather context - if so, force LLM usage
+        has_weather_context = "[Weather Context:" in original_message or "[Current Weather" in original_message
+        
+        # Step 3: Predict intent using local model (skip for weather context messages)
+        if has_weather_context:
+            intent = "fallback"  # Force weather messages to use LLM
+            reply = ""
+            logger.info("Weather context detected - bypassing intent classifier, using LLM")
+        else:
+            intent, reply = intent_model.predict_intent(original_message)
 
         if intent == "fallback":
             # Step 3: fallback via LLM (OpenRouter API)
@@ -167,7 +175,13 @@ You are **AgriAI**, an intelligent, multilingual virtual assistant trained exclu
 - Detect and mirror the user's language. (Detected: {detected_lang})
 - Maintain a friendly, respectful, and informative tone in every language.
 
-🌾 **Your Domain of Expertise (Stay Strictly Within These)**
+�️ **Weather Context Integration**
+- Always look for and utilize any weather context provided in the user's message
+- Weather context appears as "[Weather Context: ...]" or "[Current Weather in ...]"
+- Use this real-time weather data to provide accurate, location-specific agricultural advice
+- When weather data is available, reference the actual conditions in your responses
+
+�🌾 **Your Domain of Expertise (Stay Strictly Within These)**
 You are allowed to answer only agricultural topics:
 - Crop recommendation and seasonal planning
 - Soil nutrients, health improvement, and testing
@@ -184,6 +198,7 @@ You are allowed to answer only agricultural topics:
 - Keep responses factual, clear, and neatly formatted
 - Use **headings**, **bullet points**, and **short paragraphs** where applicable
 - Always provide **examples** and **practical advice**
+- When weather data is provided, specifically reference the current conditions
 - Do **not** hallucinate names of crops, fertilizers, or diseases — only use known, scientifically accurate data
 
 🌿 **Crop Recommendation Handling**
@@ -271,11 +286,26 @@ You are designed to **assist, educate, and empower farmers** using science, data
 
             except (httpx.RequestError, httpx.TimeoutException) as e:
                 logger.error(f"Network error with OpenRouter API: {str(e)}")
+                
+                # Extract weather context if available for fallback responses
+                weather_info = ""
+                if "[Weather Context:" in original_message:
+                    start = original_message.find("[Weather Context:")
+                    end = original_message.find("]", start)
+                    if end != -1:
+                        weather_info = original_message[start:end+1]
+                
                 reply = "I apologize, but I'm having trouble connecting to our AI service. Please try again later."
 
-                # Add helpful default responses for common agricultural topics
+                # Add helpful default responses for common agricultural topics with weather context
                 msg_lower = request.message.lower()
-                if any(term in msg_lower for term in ["n:", "p:", "k:", "npk", "temperature", "humidity", "rainfall", "ph"]) or request.message.count(":") >= 3:
+                if weather_info and ("crop" in msg_lower or "plant" in msg_lower or "weather" in msg_lower):
+                    reply = f"🌾 Based on your current weather conditions {weather_info.replace('[Weather Context: ', '').replace(']', '')}, here are some general recommendations:\n\n"
+                    reply += "• High humidity (>80%): Consider crops like rice, sugarcane, or water-loving vegetables\n"
+                    reply += "• Moderate temperatures (15-25°C): Good for wheat, barley, or cool-season crops\n"
+                    reply += "• Overcast conditions: Suitable for transplanting seedlings\n\n"
+                    reply += "For precise crop recommendations, please use our crop prediction tool with your soil NPK values."
+                elif any(term in msg_lower for term in ["n:", "p:", "k:", "npk", "temperature", "humidity", "rainfall", "ph"]) or request.message.count(":") >= 3:
                     reply += " For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations. Based on the data you provided, you might want to try our crop prediction endpoint directly."
                 elif "crop" in msg_lower or "plant" in msg_lower:
                     reply += " For crop recommendations, please share your soil NPK values, temperature, humidity, pH, and rainfall data. You can use the /predict-crop endpoint for precise recommendations."

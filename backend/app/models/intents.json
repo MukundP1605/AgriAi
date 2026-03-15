@@ -168,6 +168,30 @@
       ]
     },
     {
+      "tag": "crop_recommendation",
+      "patterns": [
+        "recommend me a crop",
+        "which crop should I grow?",
+        "best crop for my soil",
+        "what to plant in my field?",
+        "crop suggestion please",
+        "kaun si fasal ugayein?",
+        "mere khet ke liye best crop",
+        "suggest a good crop",
+        "crop recommendation",
+        "which crop is profitable?",
+        "what crop to grow now?",
+        "help me choose a crop",
+        "crop advice needed"
+      ],
+      "responses": [
+        "To recommend the best crop for you, I need your soil test data. Please provide: N, P, K values, soil pH, temperature, humidity, and rainfall. You can also use our Crop Recommendation tool for instant analysis!",
+        "For accurate crop recommendations, please share your soil nutrients (N, P, K), pH level, and climate data. Visit our Crop Prediction page for detailed analysis.",
+        "Crop selection depends on your soil condition. Please provide soil NPK values, pH, temperature, humidity, and rainfall data for personalized recommendations.",
+        "Main aapke liye best crop suggest kar sakta hun agar aap apna soil test data share karenge: N, P, K values, pH, temperature, humidity aur rainfall."
+      ]
+    },
+    {
       "tag": "market_prices",
       "patterns": [
         "aaj mandi me daam kya hai?",

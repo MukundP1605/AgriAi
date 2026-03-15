@@ -15,50 +15,55 @@ const Navbar = () => {
   
   // Refs for the dropdown containers to handle hover interactions
   const dropdownRef = useRef(null);
-  const aiDropdownRef = useRef(null);  
-  // Effect to handle hover on dropdowns  useEffect(() => {
-  // Effect to handle hover on dropdowns
+  const aiDropdownRef = useRef(null);
+  
+  // Helper functions for dropdown management
+  const handleUserMenuEnter = () => setIsUserMenuOpen(true);
+  const handleUserMenuLeave = () => setIsUserMenuOpen(false);
+  const handleAIMenuEnter = () => setIsAIMenuOpen(true);
+  const handleAIMenuLeave = () => setIsAIMenuOpen(false);  
+  
+  // Effect to handle hover on user profile dropdown
   useEffect(() => {
     const dropdownElement = dropdownRef.current;
     
-    if (dropdownElement) {
-      const handleMouseEnter = () => setIsUserMenuOpen(true);
-      const handleMouseLeave = () => setIsUserMenuOpen(false);
-      
-      dropdownElement.addEventListener('mouseenter', handleMouseEnter);
-      dropdownElement.addEventListener('mouseleave', handleMouseLeave);
+    if (dropdownElement && isAuthenticated) {
+      dropdownElement.addEventListener('mouseenter', handleUserMenuEnter);
+      dropdownElement.addEventListener('mouseleave', handleUserMenuLeave);
       
       return () => {
-        dropdownElement.removeEventListener('mouseenter', handleMouseEnter);
-        dropdownElement.removeEventListener('mouseleave', handleMouseLeave);
+        dropdownElement.removeEventListener('mouseenter', handleUserMenuEnter);
+        dropdownElement.removeEventListener('mouseleave', handleUserMenuLeave);
       };
     }
-  }, []);
+  }, [isAuthenticated]); // Add isAuthenticated as dependency
+  
+  // Effect to handle hover on AI tools dropdown
   useEffect(() => {
     const aiDropdownElement = aiDropdownRef.current;
     
     if (aiDropdownElement) {
-      const handleMouseEnter = () => setIsAIMenuOpen(true);
-      const handleMouseLeave = () => setIsAIMenuOpen(false);
-      
-      aiDropdownElement.addEventListener('mouseenter', handleMouseEnter);
-      aiDropdownElement.addEventListener('mouseleave', handleMouseLeave);
+      aiDropdownElement.addEventListener('mouseenter', handleAIMenuEnter);
+      aiDropdownElement.addEventListener('mouseleave', handleAIMenuLeave);
       
       return () => {
-        aiDropdownElement.removeEventListener('mouseenter', handleMouseEnter);
-        aiDropdownElement.removeEventListener('mouseleave', handleMouseLeave);
+        aiDropdownElement.removeEventListener('mouseenter', handleAIMenuEnter);
+        aiDropdownElement.removeEventListener('mouseleave', handleAIMenuLeave);
       };
     }
   }, []);
 
-  // Close dropdowns when clicking outside
+  // Close dropdowns when clicking outside (but not on hover)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (aiDropdownRef.current && !aiDropdownRef.current.contains(event.target)) {
-        setIsAIMenuOpen(false);
-      }
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsUserMenuOpen(false);
+      // Only close if it's a click event and outside the dropdown
+      if (event.type === 'mousedown') {
+        if (aiDropdownRef.current && !aiDropdownRef.current.contains(event.target)) {
+          setIsAIMenuOpen(false);
+        }
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsUserMenuOpen(false);
+        }
       }
     };
 
@@ -121,25 +126,28 @@ const Navbar = () => {
                 <span>{item.label}</span>
               </Link>
             ))}            {/* AI Tools Dropdown */}
-            <div className="relative" ref={aiDropdownRef}>
+            <div className="relative group" ref={aiDropdownRef}>
               <div 
                 className={`flex items-center space-x-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
                   ['/crop', '/disease', '/fertilizer'].includes(location.pathname)
                     ? 'bg-green-500 text-white'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
                 }`}
-                onClick={() => setIsAIMenuOpen(!isAIMenuOpen)}
+                onMouseEnter={handleAIMenuEnter}
               >
                 <span className="text-sm">🤖</span>
                 <span>AI Tools</span>
-                <svg className="w-4 h-4 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 text-current transition-transform duration-200 ${isAIMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
               {/* AI Tools dropdown menu */}
               {isAIMenuOpen && (
-                <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl py-2 z-10 border border-gray-100">
+                <div 
+                  className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                  onMouseLeave={handleAIMenuLeave}
+                >
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-800 flex items-center">
                       <span className="mr-2">🤖</span>
@@ -168,20 +176,24 @@ const Navbar = () => {
             </div>{/* User Profile */}
             <div className="flex items-center ml-4">
               {isAuthenticated && currentUser ? (
-                <div className="relative" ref={dropdownRef}>
+                <div className="relative group" ref={dropdownRef}>
                   <div 
                     className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-800 hover:bg-gray-50 cursor-pointer"
+                    onMouseEnter={handleUserMenuEnter}
                   >
                     <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
-                      M
+                      {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : currentUser.email.charAt(0).toUpperCase()}
                     </div>
                     <span>{currentUser.fullName || currentUser.email.split('@')[0]}</span>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                     {/* User dropdown menu */}                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 z-10 border border-gray-100">
+                    <div 
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100"
+                      onMouseLeave={handleUserMenuLeave}
+                    >
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm font-semibold text-gray-800">{currentUser.fullName || currentUser.email.split('@')[0]}</p>
                         <p className="text-xs text-gray-500 mt-1">{currentUser.email}</p>

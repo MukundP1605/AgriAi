@@ -126,6 +126,240 @@ async def upload_soil_report(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
 
+@router.post("/analyze-soil-report")
+async def analyze_soil_report(
+    file_path: str,
+    crop_type: str = "rice",
+    current_user: DBUser = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Analyze uploaded soil report PDF/image using OCR and provide fertilizer recommendations
+    """
+    try:
+        # Import OCR libraries (you may need to install these)
+        try:
+            import pytesseract
+            from PIL import Image
+            import pdf2image
+            
+            # Configure Tesseract path for Windows
+            if os.name == 'nt':  # Windows
+                possible_paths = [
+                    r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+                    r'C:\Program Files\tesseract-ocr-tesseract-0995615\tesseract.exe',
+                    r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+                ]
+                
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        pytesseract.pytesseract.tesseract_cmd = path
+                        break
+                else:
+                    # Try to find tesseract in PATH
+                    import shutil
+                    if not shutil.which('tesseract'):
+                        raise HTTPException(
+                            status_code=501,
+                            detail="Tesseract OCR not found. Please install Tesseract and ensure it's in your PATH or located in a standard directory."
+                        )
+            
+        except ImportError:
+            raise HTTPException(
+                status_code=501, 
+                detail="OCR functionality not available. Please install pytesseract, PIL, and pdf2image packages."
+            )
+        
+        # Check if file exists
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Uploaded file not found")
+        
+        extracted_text = ""
+        
+        # Handle PDF files
+        if file_path.lower().endswith('.pdf'):
+            # Convert PDF to images
+            images = pdf2image.convert_from_path(file_path)
+            for image in images:
+                # Extract text from each page
+                text = pytesseract.image_to_string(image, config='--psm 6')
+                extracted_text += text + "\n"
+        else:
+            # Handle image files directly
+            image = Image.open(file_path)
+            extracted_text = pytesseract.image_to_string(image, config='--psm 6')
+        
+        # Parse extracted text to find soil data
+        parsed_data = parse_soil_report_text(extracted_text)
+        
+        if not parsed_data:
+            raise HTTPException(
+                status_code=400, 
+                detail="Could not extract valid soil data from the report. Please ensure the report contains NPK values, pH, and other soil parameters."
+            )
+        
+        # Create soil test request from parsed data
+        from app.schemas.fertilizer import SoilTestRequest
+        soil_request = SoilTestRequest(
+            nitrogen=parsed_data.get('nitrogen', 50),
+            phosphorus=parsed_data.get('phosphorus', 30),
+            potassium=parsed_data.get('potassium', 40),
+            ph=parsed_data.get('ph', 6.5),
+            organic_matter=parsed_data.get('organic_matter', 2.5),
+            moisture=parsed_data.get('moisture', 20),
+            crop_type=crop_type,
+            field_size=1.0,  # Default to 1 hectare
+            location=parsed_data.get('location', 'Unknown'),
+            organic_preference=False
+        )
+        
+        # Generate fertilizer recommendation using existing logic
+        npk_analysis = await generate_npk_recommendation(soil_request)
+        application_schedule = create_application_schedule(
+            npk_analysis, 
+            crop_type,
+            False  # organic_preference
+        )
+        marketplace_matches = await match_marketplace_products(
+            npk_analysis, 
+            False,  # organic_preference
+            db
+        )
+        
+        # Save analysis to database
+        fertilizer_record = FertilizerHistory(
+            user_id=current_user.id,
+            crop_type=crop_type,
+            soil_data=json.dumps(soil_request.dict()),
+            npk_recommendation=json.dumps(npk_analysis.dict()),
+            application_schedule=json.dumps([schedule.dict() for schedule in application_schedule]),
+            organic_preference=False,
+            confidence_score=npk_analysis.confidence_score,
+            created_at=datetime.utcnow()
+        )
+        
+        db.add(fertilizer_record)
+        db.commit()
+        
+        return {
+            "message": "Soil report analyzed successfully",
+            "extracted_data": parsed_data,
+            "npk_analysis": npk_analysis,
+            "application_schedule": application_schedule,
+            "marketplace_matches": marketplace_matches,
+            "confidence_score": npk_analysis.confidence_score,
+            "request_id": fertilizer_record.id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+def parse_soil_report_text(text: str) -> Dict[str, float]:
+    """
+    Parse extracted OCR text to find soil parameters
+    This is a simplified parser - you may want to enhance it based on your soil report formats
+    """
+    import re
+    
+    parsed_data = {}
+    
+    try:
+        # Look for NPK values (various formats)
+        # N, P, K patterns
+        n_match = re.search(r'(?:nitrogen|n)\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if n_match:
+            parsed_data['nitrogen'] = float(n_match.group(1))
+        
+        p_match = re.search(r'(?:phosphorus|phosphorous|p)\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if p_match:
+            parsed_data['phosphorus'] = float(p_match.group(1))
+        
+        k_match = re.search(r'(?:potassium|k)\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if k_match:
+            parsed_data['potassium'] = float(k_match.group(1))
+        
+        # pH patterns
+        ph_match = re.search(r'ph\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if ph_match:
+            parsed_data['ph'] = float(ph_match.group(1))
+        
+        # Organic matter patterns
+        om_match = re.search(r'(?:organic\s*matter|om)\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if om_match:
+            parsed_data['organic_matter'] = float(om_match.group(1))
+        
+        # Moisture patterns
+        moisture_match = re.search(r'moisture\s*:?\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+        if moisture_match:
+            parsed_data['moisture'] = float(moisture_match.group(1))
+        
+        # Location patterns
+        location_match = re.search(r'(?:location|site|field)\s*:?\s*([a-zA-Z\s,]+)', text, re.IGNORECASE)
+        if location_match:
+            parsed_data['location'] = location_match.group(1).strip()
+        
+    except Exception as e:
+        print(f"Error parsing soil report text: {e}")
+    
+    return parsed_data
+
+@router.get("/test-ocr")
+async def test_ocr_installation():
+    """
+    Test OCR installation and configuration
+    """
+    try:
+        import pytesseract
+        from PIL import Image
+        import pdf2image
+        
+        # Configure Tesseract path for Windows
+        if os.name == 'nt':  # Windows
+            possible_paths = [
+                r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+                r'C:\Program Files\tesseract-ocr-tesseract-0995615\tesseract.exe',
+                r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+            ]
+            
+            tesseract_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    pytesseract.pytesseract.tesseract_cmd = path
+                    tesseract_path = path
+                    break
+        
+        # Test Tesseract installation
+        try:
+            version = pytesseract.get_tesseract_version()
+            return {
+                "status": "success",
+                "message": "OCR functionality is available",
+                "tesseract_version": str(version),
+                "tesseract_path": tesseract_path or "System PATH",
+                "libraries": {
+                    "pytesseract": "Available",
+                    "PIL": "Available", 
+                    "pdf2image": "Available"
+                }
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Tesseract not properly configured: {str(e)}",
+                "tesseract_path": tesseract_path,
+                "suggestion": "Please check Tesseract installation or PATH configuration"
+            }
+            
+    except ImportError as e:
+        return {
+            "status": "error",
+            "message": "Required OCR libraries not installed",
+            "missing_library": str(e),
+            "solution": "Run: pip install pytesseract Pillow pdf2image"
+        }
+
 @router.get("/fertilizer-history")
 async def get_fertilizer_history(
     current_user: DBUser = Depends(get_current_active_user),

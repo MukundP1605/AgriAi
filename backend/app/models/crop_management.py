@@ -17,6 +17,18 @@ class CropSession(Base):
     status = Column(String(50))  # Match existing DB schema (varchar(50))
     created_at = Column(DateTime)  # Match existing DB schema
     updated_at = Column(DateTime)  # Match existing DB schema
+    
+    # Relationships
+    user = relationship("DBUser", back_populates="crop_sessions")
+    stages = relationship("CropStage", back_populates="session")
+    reminders = relationship("Reminder", back_populates="session")
+    pest_alerts = relationship("PestAlert", back_populates="session")
+    farm_inputs = relationship("FarmInput", back_populates="session")
+    harvest_records = relationship("HarvestRecord", back_populates="session")
+    analytics = relationship("Analytics", back_populates="session")
+    
+    def __repr__(self):
+        return f"<CropSession(id={self.id}, crop_name='{self.crop_name}', user_id={self.user_id})>"
 
 class CropStage(Base):
     __tablename__ = "crop_stages"
@@ -30,7 +42,10 @@ class CropStage(Base):
     created_at = Column(DateTime, default=datetime.now)
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="stages")
+    
+    def __repr__(self):
+        return f"<CropStage(id={self.id}, name='{self.name}', session_id={self.session_id})>"
 
 class Reminder(Base):
     __tablename__ = "reminders"
@@ -44,7 +59,10 @@ class Reminder(Base):
     completed = Column(Integer, default=0)  # 0 for pending, 1 for completed
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="reminders")
+    
+    def __repr__(self):
+        return f"<Reminder(id={self.id}, title='{self.title}', type='{self.reminder_type}')>"
 
 class PestAlert(Base):
     __tablename__ = "pest_alerts"
@@ -58,7 +76,10 @@ class PestAlert(Base):
     recommended_action = Column(Text)
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="pest_alerts")
+    
+    def __repr__(self):
+        return f"<PestAlert(id={self.id}, name='{self.name}', severity='{self.severity}')>"
 
 class FarmInput(Base):
     __tablename__ = "farm_inputs"
@@ -73,7 +94,10 @@ class FarmInput(Base):
     notes = Column(Text)
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="farm_inputs")
+    
+    def __repr__(self):
+        return f"<FarmInput(id={self.id}, name='{self.name}', type='{self.input_type}')>"
 
 class HarvestRecord(Base):
     __tablename__ = "harvest_records"
@@ -89,7 +113,10 @@ class HarvestRecord(Base):
     created_at = Column(DateTime, default=datetime.now)
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="harvest_records")
+    
+    def __repr__(self):
+        return f"<HarvestRecord(id={self.id}, quantity={self.quantity}, session_id={self.session_id})>"
 
 class Report(Base):
     __tablename__ = "reports"
@@ -102,7 +129,10 @@ class Report(Base):
     generated_date = Column(DateTime, default=datetime.now)
     
     # Relationships
-    user = relationship("DBUser")
+    user = relationship("DBUser", back_populates="reports")
+    
+    def __repr__(self):
+        return f"<Report(id={self.id}, title='{self.title}', type='{self.report_type}')>"
 
 class Analytics(Base):
     __tablename__ = "analytics"
@@ -123,4 +153,7 @@ class Analytics(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
     # Relationships
-    session = relationship("CropSession")
+    session = relationship("CropSession", back_populates="analytics")
+    
+    def __repr__(self):
+        return f"<Analytics(id={self.id}, session_id={self.session_id}, profit={self.profit})>"
