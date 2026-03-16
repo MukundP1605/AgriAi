@@ -40,3 +40,4 @@ print(f"✅ Test Accuracy: {best_model.score(X_test, y_test):.2f}")
 model_path = os.path.join(BASE_DIR, "backend", "app", "models", "crop_model.pkl")
 joblib.dump(best_model, model_path)
 print(f"✅ Best model saved to {model_path}")
+# Updated 2026-07-13 19:26:00
