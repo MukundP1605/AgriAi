@@ -123,4 +123,4 @@ def save_crop_prediction(soil_condition: str, weather: str, region: str, predict
     db.refresh(db_prediction)
     return db_prediction
 
-# Note: Crop management models moved to app/models/crop_management.py to avoid duplicates
+# Note: Crop management models moved to app/models/crop_management.py to avoid duplicates# Updated 2026-07-13 19:26:08
