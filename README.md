@@ -1,18 +1,10 @@
-<!-- Project Banner -->
-<p align="center">
-  <img src="https://via.placeholder.com/1000x250.png?text=AgriAI+-+AI+Powered+Farming+Assistant" alt="AgriAI Banner">
-</p>
-
 <!-- Badges -->
 <p align="center">
-  <a href="https://github.com/<your-username>/AgriAI/stargazers">
-    <img src="https://img.shields.io/github/stars/<your-username>/AgriAI?style=for-the-badge" alt="Stars">
+  <a href="https://github.com/MukundP1605/AgriAI/stargazers">
+    <img src="https://img.shields.io/github/stars/MukundP1605/AgriAI?style=for-the-badge" alt="Stars">
   </a>
-  <a href="https://github.com/<your-username>/AgriAI/network/members">
-    <img src="https://img.shields.io/github/forks/<your-username>/AgriAI?style=for-the-badge" alt="Forks">
-  </a>
-  <a href="https://github.com/<your-username>/AgriAI/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/<your-username>/AgriAI?style=for-the-badge" alt="License">
+  <a href="https://github.com/MukundP1605/AgriAI/network/members">
+    <img src="https://img.shields.io/github/forks/MukundP1605/AgriAI?style=for-the-badge" alt="Forks">
   </a>
   <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Status">
 </p>
@@ -90,7 +82,7 @@ AgriAI/
 
 ### 1️⃣ Clone Repo
 ```bash
-git clone https://github.com/<your-username>/AgriAI.git
+git clone https://github.com/MukundP1605/AgriAI.git
 cd AgriAI
 
 2️⃣ Backend Setup
@@ -114,7 +106,7 @@ Upload plant images for analysis.
 Chat with the AI assistant.
 
 🖼 Screenshots
-<p align="center"> <img src="https://via.placeholder.com/800x400.png?text=Screenshot+1" alt="Screenshot 1" width="80%"> <img src="https://via.placeholder.com/800x400.png?text=Screenshot+2" alt="Screenshot 2" width="80%"> </p>
+_Screenshots coming soon._
 🔮 Future Scope
 
 🛒 E-commerce store for farm tools.
